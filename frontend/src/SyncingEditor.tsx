@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { BaseOperation, Editor, Operation, createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import initialValue from './slateInitialValue'
-import mitt, { Emitter } from "mitt"
+import io from "socket.io-client";
 
 
+const socket = io("http://localhost:4000",);
 
-const emitter = mitt();
 
 
 
@@ -17,22 +17,21 @@ const SyncingEditor = () => {
     // Render the Slate context.
     const id = useRef(`${Date.now()}`);
     const remote = useRef(false);
-    const editor_ref = useRef<Editor | null>(null)
 
     //upon rendering the component - register a event listener
     useEffect(() => {
-        const listener = (type: string, event: Operation[]) => {
-            if (id.current !== type) {
+        const listener = ({ editorId, ops }: { editorId: string, ops: string }) => {
+            if (id.current !== editorId) {
                 remote.current = true
-                console.log('recived op from:', type, 'applying operation to:', id.current)
-                console.log(event.forEach(op => console.log(op.type, op.data)))
-                event.forEach(op => editor.apply(op));
+                console.log('recived op from:', editorId, 'applying operation to:', id.current)
+                console.log(JSON.parse(ops).forEach((op: any) => console.log(op.type, op.data)))
+                JSON.parse(ops).forEach((op: any) => editor.apply(op));
                 remote.current = false;
             }
         };
-        (emitter as any).on("*", listener);
+        socket.on("new-remote-operations", listener);
         return () => {
-            (emitter as any).off("*", listener);
+            socket.off("new-remote-operations", listener);
         };
 
     }, []);
@@ -55,7 +54,7 @@ const SyncingEditor = () => {
                     .map((o: any) => ({ ...o, data: { source: "one" } }));
 
                 if (ops.length && !remote.current) {
-                    emitter.emit(id.current, ops);
+                    socket.emit("new-operations", { editorId: id.current, ops: JSON.stringify(ops) });
                 }
             }}
         >
