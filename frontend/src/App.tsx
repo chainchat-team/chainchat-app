@@ -20,7 +20,7 @@ const App = () => {
   return (
     <div>
       <SyncingEditor />
-      <SyncingEditor />
+      {/* <SyncingEditor /> */}
       {/* <SyncingEditor /> */}
     </div>
   )
