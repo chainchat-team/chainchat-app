@@ -1,28 +1,28 @@
-// Import React dependencies.
-import React, { useState } from 'react'
-// Import the Slate editor factory.
-import { createEditor } from 'slate'
+import { RouterProvider, createBrowserRouter, redirect } from 'react-router-dom';
+import GroupEditor, { loader as groupEditorLoader } from './GroupEditor.tsx'
 
-// Import the Slate components and React plugin.
-import { Slate, Editable, withReact } from 'slate-react'
-import initialValue from './slateInitialValue'
-import SyncingEditor from './SyncingEditor'
+export async function loader() {
+  return redirect(`group/${Date.now()}`)
+}
 
-
-// type CustomText = { text: string }
-// type CustomElement = { type: 'paragraph'; children: CustomText[] }
+const router = createBrowserRouter([
+  {
+    path: '/',
+    loader: loader
+  },
+  {
+    path: "group/:id",
+    element: <GroupEditor />,
+    loader: groupEditorLoader
+  },
+])
 
 
 
 
 const App = () => {
-  // Render the Slate context.
   return (
-    <div>
-      <SyncingEditor />
-      {/* <SyncingEditor /> */}
-      {/* <SyncingEditor /> */}
-    </div>
+    <RouterProvider router={router} />
   )
 }
 

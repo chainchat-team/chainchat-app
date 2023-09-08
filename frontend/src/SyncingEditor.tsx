@@ -2,15 +2,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { BaseOperation, Descendant, Editor, Operation, createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
-// import initialValue from './slateInitialValue'
 import io from "socket.io-client";
+
 
 
 const socket = io("http://localhost:4000");
 
+type PropsType = { groupId: string }
 
 
-const SyncingEditor = () => {
+const SyncingEditor = ({ groupId }: PropsType) => {
     const [editor] = useState(() => withReact(createEditor()));
     // Render the Slate context.
     const [value, setValue] = useState<Descendant[] | null>(null)
@@ -21,7 +22,7 @@ const SyncingEditor = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:4000/initial-value");
+                const response = await fetch(`http://localhost:4000/groups/${groupId}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch initial value");
                 }
@@ -39,10 +40,9 @@ const SyncingEditor = () => {
                 remote.current = false;
             }
         };
-        socket.on("new-remote-operations", listener);
+        socket.on(`new-remote-operations-${groupId}`, listener);
         return () => {
-            console.log('unmounting......')
-            socket.off("new-remote-operations", listener);
+            socket.off(`new-remote-operations-${groupId}`, listener);
         };
 
     }, []);
@@ -73,7 +73,8 @@ const SyncingEditor = () => {
                     socket.emit("new-operations", {
                         editorId: id.current,
                         ops: JSON.stringify(ops),
-                        value: decendants
+                        value: decendants,
+                        groupId: groupId
                     });
                 }
             }}

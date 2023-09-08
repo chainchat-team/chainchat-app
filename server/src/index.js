@@ -2,33 +2,39 @@ const app = require("express")();
 const cors = require("cors");
 const http = require("http").Server(app);
 const options = {
-    cors: { // <-- Fix the typo here
-        origin: "http://localhost:5173", // Replace with your frontend URL
+    cors: {
+        origin: "http://localhost:5173",
         methods: ["GET", "POST", "FETCH"],
         credentials: true
     }
 }
 const io = require("socket.io")(http, options);
 app.use(cors(options.cors))
-let value = [
+
+
+let initialEditorvalue = [
     {
         type: 'paragraph',
         children: [{ text: 'A line of text in a paragraph.' }],
     },
 ]
-// Configure CORS to allow requests from your frontend origin
+
+let groupData = {}
 io.on("connection", function (socket) {
     socket.on("new-operations", function (data) {
-        value = data.value
-        io.emit("new-remote-operations", data);
+        groupData[data.groupId] = data.value
+        io.emit(`new-remote-operations-${data.groupId}`, data);
     });
 });
 
-// Add an HTTP GET route to fetch the initial value
-app.get("/initial-value", (req, res) => {
-    // You can send the initial value as JSON
-    res.json(value);
-});
+
+app.get("/groups/:id", (req, res) => {
+    const { id } = req.params;
+    if (!(id in groupData)) {
+        groupData[id] = initialEditorvalue
+    }
+    res.send(groupData[id])
+})
 
 http.listen(4000, function () {
     console.log("listening on *:4000");
