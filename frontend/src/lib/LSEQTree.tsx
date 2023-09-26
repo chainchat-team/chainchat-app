@@ -38,7 +38,6 @@ class LSEQTree {
         this.boundary = boundary;
         this.root = { children: [], identifier: { digit: -1, siteId: this.siteId } };
         this.initTree();
-
     }
     /** 
      * Initalize the tree with 2 starting node

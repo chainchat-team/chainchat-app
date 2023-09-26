@@ -15,7 +15,7 @@ app.use(cors(options.cors))
 let initialEditorvalue = [
     {
         type: 'paragraph',
-        children: [{ text: 'A line of text in a paragraph.' }],
+        children: [{ text: 'A line of text in a paragraph.', characters: [] }],
     },
 ]
 

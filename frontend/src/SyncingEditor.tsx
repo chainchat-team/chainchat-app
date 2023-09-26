@@ -1,26 +1,57 @@
 // Import React dependencies.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { BaseOperation, Descendant, Editor, Operation, createEditor } from 'slate'
+import { Node, Transforms, BaseOperation, Descendant, Editor, Operation, createEditor, InsertTextOperation, Text } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import io from "socket.io-client";
-
-
+import { createCrdt } from './lib/create-crdt';
+import { CrdtInterface } from './lib/interfaces/Crdt';
+const crdt = createCrdt()
 
 const socket = io("http://localhost:4000");
 
 type PropsType = { groupId: string }
 
 const Leaf = ({ attributes, children, leaf }) => {
+    // leaf.characters = []
+    // attributes.characters = []
+    // console.log(children)
+    // console.log('here')
     if (leaf.bold) {
         children = <strong>{children}</strong>
     }
+
     return <span {...attributes}>{children}</span>
 }
 
 
+const withCustomNormalization = (editor: Editor) => {
+    const { normalizeNode } = editor;
+
+    editor.normalizeNode = (entry) => {
+        const [node, path] = entry;
+
+        // Normalize leaf nodes to include a `characters` property.
+        if (Text.isText(node)) {
+            if (node.characters === undefined) {
+                // Add an empty characters array to the leaf node.
+                Transforms.setNodes(editor, { ...node, characters: [] }, { at: path });
+            }
+        }
+
+        // Call the original `normalizeNode` function for other normalizations. (built-in constraint)
+        normalizeNode(entry);
+    };
+
+    return editor;
+};
+
+
 const SyncingEditor = ({ groupId }: PropsType) => {
-    const [editor] = useState(() => withReact(createEditor()));
+    const [editor] = useState(() => withCustomNormalization(withReact(createEditor())));
+    // const [editor] = useState(() => withReact(createEditor()));
+    //NEXT: how do we add customer `character mark` on all text node by default??
     // Render the Slate context.
+
     const [value, setValue] = useState<Descendant[] | null>(null)
     const id = useRef(`${Date.now()}`);
     const remote = useRef(false);
@@ -62,8 +93,39 @@ const SyncingEditor = ({ groupId }: PropsType) => {
         <>
             <button onMouseDown={e => {
                 e.preventDefault();
-                console.log(JSON.stringify(editor.children))
-                Editor.addMark(editor, 'bold', true)
+                // console.log(JSON.stringify(editor.children))
+                // const location1 = { path: [0, 0], offset: 0 }
+                // editor.setPoint(location1)
+                // Editor.addMark(editor, 'bold', true)
+                // Editor.addMark(editor, 'characters', [0, 0, 0])
+
+                const location2 = { path: [1, 0], offset: 0 }
+                editor.setPoint(location2)
+                // Editor.addMark(editor, 'bold', false)
+                // Editor.addMark(editor, 'characters', [-1, -1, -1])
+                // const location = [1, 0]
+                // console.log(Editor.before(editor, location))
+                // console.log(Editor.after(editor, location))
+                // Node.get(editor.children[0], location)
+                // console.log('--')
+                // const [leafNode, path] = Editor.leaf(editor, location2)
+                // console.log(leafNode)
+                // console.log((leafNode as any).characters)
+                // editor.setPoint(location1)
+                // console.log(Editor.marks(editor))
+                // console.log(Editor.marks(editor))
+                // console.log('--')
+                // Editor.withoutNormalizing(editor, () => {
+                //     editor.apply({ type: 'split_node', path: [0], position: 0, properties: {} })
+                //     editor.apply({ type: 'split_node', path: [0], position: 1, properties: {} })
+
+                // })
+
+                // editor.apply({ type: 'split_node', path: [0, 0], position: 1, properties: {} })
+                // editor.apply({ type: 'split_node', path: [0, 1], position: 2, properties: {} })
+                // const lineNode = { type: 'line', children: [{ text: 'new line added' }] }
+                // editor.apply({ type: 'insert_node', path: [0, 0], node: lineNode });
+                // editor.apply({ type: 'insert_text', path: [0, 0], offset: 0, text: 'Hello World'})
             }}>Bold</button>
             <Slate
                 editor={editor}
@@ -71,6 +133,22 @@ const SyncingEditor = ({ groupId }: PropsType) => {
                 onChange={(decendants: Descendant[]) => {
                     console.log('change detected')
                     // setValue(decendants)
+                    // console.log(decendants)
+                    // console.log(editor.operations)
+                    // console.log(editor.children)
+                    // console.log(editor.operations)
+                    // if (editor.operations[0]?.type === 'insert_text') {
+                    //     console.log(Editor.before(editor, { path: editor.operations[0].path, offset: editor.operations[0].offset }))
+                    //     console.log(Editor.after(editor, { path: editor.operations[0].path, offset: editor.operations[0].offset }))
+
+                    // }
+                    // const opPoint = { path: editor.operations[0].path, offset: editor.operations[0].offset }
+                    // console.log(Editor.after(editor, opPoint))
+                    if (editor.operations[0]?.type === 'insert_text') {
+                        const op = editor.operations[0] as InsertTextOperation
+                        CrdtInterface.handleLocalInsert(crdt, editor, op)
+
+                    }
                     const ops = editor.operations.filter(o => {
                         if (o) {
                             return (
@@ -101,7 +179,8 @@ const SyncingEditor = ({ groupId }: PropsType) => {
                             case 'b': {
                                 event.preventDefault()
                                 console.log('b pressed')
-                                Editor.addMark(editor, 'italic', true)
+                                // Editor.addMark(editor, 'italic', true)
+                                // Editor.addMark(editor, 'characters', [1, 2, 3])
                                 break
                             }
                         }
