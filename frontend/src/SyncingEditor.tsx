@@ -1,6 +1,9 @@
 // Import React dependencies.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Node, Transforms, BaseOperation, Descendant, Editor, Operation, createEditor, InsertTextOperation, Text } from 'slate'
+import {
+    Node, Transforms, BaseOperation, Descendant, Editor, Operation,
+    createEditor, InsertTextOperation, Text, Range, Selection
+} from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import io from "socket.io-client";
 import { createCrdt } from './lib/create-crdt';
@@ -131,12 +134,28 @@ const SyncingEditor = ({ groupId }: PropsType) => {
                 editor={editor}
                 initialValue={value}
                 onChange={(decendants: Descendant[]) => {
-                    console.log('change detected')
+                    // console.log('change detected')
                     // setValue(decendants)
                     // console.log(decendants)
                     // console.log(editor.operations)
                     // console.log(editor.children)
                     // console.log(editor.operations)
+                    // console.log(editor.selection)
+
+                    // Capture the current selection
+                    // if (selection && Range.isCollapsed(selection as Range)) {
+                    //     // Editor.start(edit)
+                    //     const start = Editor.start(editor, selection);
+                    //     // console.log(Editor.start(editor, selection))
+                    //     // Use Editor.nodes to find the ancestor nodes and their paths
+                    //     const nodesAndPaths = Array.from(
+                    //         Editor.nodes(editor, {
+                    //             at: start.path,
+                    //             mode: 'lowest', // Traverse from the current location to the lowest level
+                    //         })
+                    //     );
+                    //     console.log(nodesAndPaths)
+                    // }
                     // if (editor.operations[0]?.type === 'insert_text') {
                     //     console.log(Editor.before(editor, { path: editor.operations[0].path, offset: editor.operations[0].offset }))
                     //     console.log(Editor.after(editor, { path: editor.operations[0].path, offset: editor.operations[0].offset }))
@@ -144,9 +163,9 @@ const SyncingEditor = ({ groupId }: PropsType) => {
                     // }
                     // const opPoint = { path: editor.operations[0].path, offset: editor.operations[0].offset }
                     // console.log(Editor.after(editor, opPoint))
-                    if (editor.operations[0]?.type === 'insert_text') {
-                        const op = editor.operations[0] as InsertTextOperation
-                        CrdtInterface.handleLocalInsert(crdt, editor, op)
+                    if (editor.operations[0]?.type === 'insert_text' || editor.operations[0]?.type === 'split_node') {
+                        const ops = editor.operations
+                        CrdtInterface.handleLocalInsert(crdt, editor, ops)
 
                     }
                     const ops = editor.operations.filter(o => {

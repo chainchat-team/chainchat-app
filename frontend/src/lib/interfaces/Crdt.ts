@@ -1,4 +1,4 @@
-import { Editor, InsertTextOperation, Point } from "slate";
+import { BaseOperation, Editor, InsertTextOperation, Point, SplitNodeOperation } from "slate";
 import { Char } from "./Char";
 import { generateChar } from "../crdt/generateChar";
 import { retrieveStrategy } from "../crdt/retrieveStrategy";
@@ -13,12 +13,13 @@ export interface Crdt {
     strategyCache: boolean[]
     //methods
     insertChar: (editor: Editor, char: Char, point: Point) => void;
+    splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
 }
 
 export interface CrdtInterface {
     retrieveStrategy: (crdt: Crdt, depth: number) => boolean;
     generateChar: (crdt: Crdt, char1: Char, char2: Char, value: string) => Char
-    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: InsertTextOperation) => void
+    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
 }

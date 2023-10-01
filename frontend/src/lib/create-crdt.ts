@@ -1,4 +1,5 @@
 import { insertChar } from "./crdt/insertChar";
+import { splitLine } from "./crdt/splitLine";
 import { Crdt } from "./interfaces/Crdt";
 
 export const createCrdt = (): Crdt => {
@@ -7,7 +8,8 @@ export const createCrdt = (): Crdt => {
         boundary: 10,
         siteId: 1,
         strategyCache: [],
-        insertChar: (...args) => insertChar(...args)
+        insertChar: (...args) => insertChar(...args),
+        splitLine: (...args) => splitLine(...args)
     }
     return crdt
 }

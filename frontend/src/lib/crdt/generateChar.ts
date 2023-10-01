@@ -23,17 +23,21 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
     const step = Math.min(crtd.boundary, interval)
 
     const strategy = CrdtInterface.retrieveStrategy(crtd, depth)
-
+    console.log('---iterval---')
+    console.log(interval)
+    console.log('---iterval---')
     let digit;
     if (strategy) {
-        const addValue = Math.floor(Math.random() * (step - 0)) + step
+        // 0,.....,step-1
+        // 1,.....,step
+        const addValue = Math.floor(Math.random() * (step - 0)) + 1
         digit = val1 + addValue;
     } else {
-        const subValue = Math.floor(Math.random() * (step - 0)) + step
+        const subValue = Math.floor(Math.random() * (step - 0)) + 1
         digit = val2 - subValue;
     }
 
-    const parentDepth: number = strategy ? Math.min(path1.length - 1, depth) : Math.min(path2.length - 1, depth);
+    const parentDepth: number = strategy ? Math.min(path1.length - 1, depth - 1) : Math.min(path2.length - 1, depth - 1);
     const identifiers: Identifier[] = strategy ? path1.slice(0, parentDepth + 1) : path2.slice(0, parentDepth + 1)
     const identifier: Identifier = { digit: digit, siteId: crtd.siteId }
     identifiers.push(identifier)
