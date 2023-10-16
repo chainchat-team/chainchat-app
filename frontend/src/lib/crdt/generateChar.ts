@@ -6,9 +6,8 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
     // generate a new identifier given identifiers
     let depth: number = 0
     let interval: number = 0
-    const path1 = char1.identifiers;
-    const path2 = char2.identifiers;
-
+    const path1 = [...char1.identifiers]
+    const path2 = [...char2.identifiers]
 
     let val1 = 0;
     let val2 = crtd.base;
@@ -21,11 +20,7 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
     depth -= 1;
 
     const step = Math.min(crtd.boundary, interval)
-
     const strategy = CrdtInterface.retrieveStrategy(crtd, depth)
-    console.log('---iterval---')
-    console.log(interval)
-    console.log('---iterval---')
     let digit;
     if (strategy) {
         // 0,.....,step-1
@@ -38,7 +33,17 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
     }
 
     const parentDepth: number = strategy ? Math.min(path1.length - 1, depth - 1) : Math.min(path2.length - 1, depth - 1);
-    const identifiers: Identifier[] = strategy ? path1.slice(0, parentDepth + 1) : path2.slice(0, parentDepth + 1)
+    let identifiers: Identifier[] = strategy ? path1.slice(0, parentDepth + 1) : path2.slice(0, parentDepth + 1)
+
+    const paddingSize = Math.max(0, depth - 1 - parentDepth)
+    const val = strategy === true ? 0 : crtd.base
+    for (let i = 0; i < paddingSize; i++) {
+        identifiers.push({
+            digit: val,
+            siteId: crtd.siteId
+        })
+
+    }
     const identifier: Identifier = { digit: digit, siteId: crtd.siteId }
     identifiers.push(identifier)
 

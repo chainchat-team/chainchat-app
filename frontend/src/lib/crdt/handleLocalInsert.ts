@@ -29,15 +29,6 @@ export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOp
     // we we need the leftChar because of the we need it's identifer. In this case identifier will be empty
     // also the generation of id maybe wrong because...the 2 default nodes are not consider
     const char: Char = CrdtInterface.generateChar(crtd, leftChar as Char, rightChar, text)
-    console.log('---operational point----')
-    console.log(operationPoint)
-    console.log('---operational point----')
-    console.log('---Left Char----')
-    console.log(leftChar)
-    console.log('---Left Char----')
-    console.log('---Right Char----')
-    console.log(rightChar)
-    console.log('---Right Char----')
     //insert new char in the correct position
     crtd.insertChar(editor, char, operationPoint)
 
