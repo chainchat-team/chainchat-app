@@ -1,6 +1,6 @@
 import { Char, CharInterface } from "./Char"
 export interface Characters {
-    chars: Char[];
+    characters: Char[];
 }
 
 
@@ -11,8 +11,8 @@ export interface CharactersInterface {
 export const CharactersInterface: CharactersInterface = {
     compareTo: (val: Characters, other: Characters): number => {
         // Compare the identifiers at each level of the positions
-        const chars1 = val.chars;
-        const chars2 = other.chars;
+        const chars1 = val.characters;
+        const chars2 = other.characters;
         for (let i = 0; i < Math.min(chars1.length, chars2.length); i++) {
             const comp = CharInterface.compareTo(chars1[i], chars2[i]);
             // If they are not equal, return the comparison result

@@ -4,6 +4,9 @@ import { Char } from "../interfaces/Char";
 export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOperation[]): void {
     var text: string;
     var operationPoint: Point;
+    if (operations.length === 0) {
+        throw new Error('Operations array is empty.')
+    }
     if (operations[0].type === 'split_node') {
         //update the characters array in the 2 new nodes
         crtd.splitLine(editor, operations as SplitNodeOperation[])
