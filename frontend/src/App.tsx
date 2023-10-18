@@ -25,7 +25,7 @@ const targetPeerId = location.search.slice(1) || '0'
 // console.log(targetPeerId)
 const peer = new Peer({
   host: 'localhost',
-  port: 3000,
+  port: 4000,
   path: '/server',
 })
 const siteId = 1
@@ -38,7 +38,7 @@ const App = () => {
     // <RouterProvider router={router} />
     <>
       <PeerId />
-      <SlateEditor crdt={crdt} />
+      <SlateEditor crdt={crdt} peerId={peer.id} siteId={siteId} />
     </>
   )
 }

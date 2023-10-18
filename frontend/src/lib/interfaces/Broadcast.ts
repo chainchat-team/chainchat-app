@@ -1,6 +1,7 @@
 import { Peer, DataConnection } from "peerjs"
 import { addOutGoingConnection } from "../broadcast/addOutGoingConnection"
 import { addIncomingConnection } from "../broadcast/addIncomingConnection"
+import { BaseOperation, Operation } from "slate"
 import { processOutgoingBuffer } from "../broadcast/processOutgoingBuffer"
 import { handleIncomingConnection } from "../broadcast/connection/handleIncomingConnection"
 import { handleOutgoingConnection } from "../broadcast/connection/handleOutgoingConnection"

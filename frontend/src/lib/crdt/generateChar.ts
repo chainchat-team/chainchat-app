@@ -32,8 +32,8 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
         digit = val2 - subValue;
     }
 
-    const parentDepth: number = strategy ? Math.min(path1.length - 1, depth - 1) : Math.min(path2.length - 1, depth - 1);
-    let identifiers: Identifier[] = strategy ? path1.slice(0, parentDepth + 1) : path2.slice(0, parentDepth + 1)
+    const parentDepth: number = Math.min(path1.length - 1, depth - 1)
+    let identifiers: Identifier[] = path1.slice(0, parentDepth + 1)
 
     const paddingSize = Math.max(0, depth - 1 - parentDepth)
     const val = strategy === true ? 0 : crtd.base

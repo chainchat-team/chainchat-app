@@ -1,6 +1,6 @@
 import { Controller, ControllerInterface } from "../interfaces/Controller"
 import { eventBus } from "../events/create-eventbus"
-import { SyncRequest } from "../types/SyncRequest";
+import { SyncRequest } from "../types/BroadcastEventTypes";
 
 export const createController = (
     targetPeerId: string,

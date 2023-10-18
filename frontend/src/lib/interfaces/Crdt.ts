@@ -20,7 +20,7 @@ export interface Crdt {
 export interface CrdtInterface {
     retrieveStrategy: (crdt: Crdt, depth: number) => boolean;
     generateChar: (crdt: Crdt, char1: Char, char2: Char, value: string) => Char
-    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => void
+    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char
     handleRemoteInsert: (crtd: Crdt, editor: Editor, char: Char) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;

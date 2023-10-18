@@ -2,6 +2,7 @@ import { BaseOperation, Editor, InsertTextOperation, SplitNodeOperation, without
 import { Crdt, CrdtInterface } from "../interfaces/Crdt";
 import { Char, CharInterface } from "../interfaces/Char";
 export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void {
+    console.log('---handleRemoteInsert-----')
     const path = CharInterface.findEditorPath(char, editor)
     //find the leaf node at the path
 
@@ -9,6 +10,9 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
     //this line is giving me a infinite loop
     const offset = CharInterface.findInsertIndex(char, leafNode.characters)
 
+    console.log(editor.children)
+    console.log(char)
+    console.log({ path: path, offset: offset })
 
     let ops: BaseOperation[] = []
     if (char.value !== '\n') {
@@ -31,15 +35,20 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
             type: 'split_node',
             path: leafNodePath.slice(0, leafNodePath.length - 1),
             position: 1,
-            properties: {}
+            properties: {},
         }
         ops.push(splitAtLeaf)
         ops.push(splitAtBlock)
     }
+
     withoutNormalizing(editor, () => {
         ops.forEach(op => editor.apply(op))
     })
 
-    CrdtInterface.handleLocalInsert(crdt, editor, ops)
-
+    if (char.value === '\n') {
+        crdt.splitLine(editor, ops as SplitNodeOperation[])
+    }
+    crdt.insertChar(editor, char, { path: path, offset: offset })
+    console.log(editor.children)
+    console.log('---handleRemoteInsert-----')
 }

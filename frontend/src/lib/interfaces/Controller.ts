@@ -1,6 +1,6 @@
 import { handleSync } from "../contoller/handleSync";
 import { setUrlId } from "../contoller/setUrlId";
-import { SyncResponse } from "../types/SyncRequest";
+import { SyncResponse } from "../types/BroadcastEventTypes";
 export interface Controller {
     host: string,
     // id of peer that you are connected to

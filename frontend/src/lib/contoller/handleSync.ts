@@ -1,6 +1,6 @@
 import initialValue from "../../slateInitialValue";
 import { Controller, ControllerInterface } from "../interfaces/Controller";
-import { SyncResponse } from "../types/SyncRequest";
+import { SyncResponse } from "../types/BroadcastEventTypes";
 
 export function handleSync(contoller: Controller, syncResponse: SyncResponse) {
     //urlId === peerId   

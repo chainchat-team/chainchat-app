@@ -1,7 +1,7 @@
 import { BaseOperation, Editor, Point, SplitNodeOperation } from "slate"
 import { Crdt, CrdtInterface } from "../interfaces/Crdt";
 import { Char } from "../interfaces/Char";
-export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOperation[]): void {
+export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOperation[]): Char {
     var text: string;
     var operationPoint: Point;
     if (operations.length === 0) {
@@ -35,6 +35,6 @@ export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOp
     //insert new char in the correct position
     crtd.insertChar(editor, char, operationPoint)
 
-    //TODO:boardcast
+    return char
 }
 
