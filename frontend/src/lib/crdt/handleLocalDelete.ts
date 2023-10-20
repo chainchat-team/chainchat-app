@@ -27,7 +27,7 @@ export function handleLocalDelete(crdt: Crdt, editor: Editor, operations: BaseOp
             const updatedCharacters = [...characters.slice(0, offset), ...characters.slice(endOffset + 1)];
             const updatedNode = { ...leafNode, characters: updatedCharacters }
             Transforms.setNodes(editor, updatedNode, { at: leafNodePath });
-            cache.push(characters[offset])
+            characters.slice(offset, endOffset + 1).forEach(char => cache.push(char))
         } else if (operation.type === 'remove_node') {
             const leafNode = (operation.node as any).children[0]
             if ((leafNode as any).characters === undefined) {
@@ -63,8 +63,14 @@ export function handleLocalDelete(crdt: Crdt, editor: Editor, operations: BaseOp
             const updatedbottomNode = { ...bottomNode, characters: updatedCharacters }
             Transforms.setNodes(editor, updatedTopNode, { at: topNodePath })
             Transforms.setNodes(editor, updatedbottomNode, { at: bottomNodePath })
+
+            // add the newLine char was removed to the cache
+            cache.push((topNode as any).characters[length - 1])
         }
     }
+    console.log('---handleLocalDelete----')
+    console.log(cache)
+    console.log('---handleLocalDelete----')
     return []
 
 }

@@ -19,17 +19,9 @@ type PropsType = {
 const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
     const { apply } = editor
     editor.apply = operation => {
-        // console.log(Text.isText(editor.children[0]))
-        // console.log(Text.isText(editor.children[0].children[0]))
         if (['remove_text', 'merge_node', 'remove_node'].includes(operation.type)) {
-            // if (operation.type === 'merge_node') {
-            //     const gen = Node.texts(editor, { from: [operation.path[0] - 1], to: operation.path })
-            //     const list = [...gen]
-            //     console.log(list)
-            // }
             CrdtInterface.handleLocalDelete(crdt, editor, [operation])
         }
-
         apply(operation)
     }
     return editor
