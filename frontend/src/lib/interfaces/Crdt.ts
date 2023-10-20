@@ -6,6 +6,7 @@ import { handleLocalInsert } from "../crdt/handleLocalInsert";
 import { findCharToLeft } from "../crdt/findCharToLeft";
 import { findCharToRight } from "../crdt/findCharToRight";
 import { handleRemoteInsert } from "../crdt/handleRemoteInsert";
+import { handleLocalDelete } from "../crdt/handleLocalDelete";
 export interface Crdt {
     // Core state
     base: number
@@ -21,6 +22,7 @@ export interface CrdtInterface {
     retrieveStrategy: (crdt: Crdt, depth: number) => boolean;
     generateChar: (crdt: Crdt, char1: Char, char2: Char, value: string) => Char
     handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char
+    handleLocalDelete: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
     handleRemoteInsert: (crtd: Crdt, editor: Editor, char: Char) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
@@ -30,6 +32,7 @@ export const CrdtInterface: CrdtInterface = {
     generateChar: (...args) => generateChar(...args),
     retrieveStrategy: (...args) => retrieveStrategy(...args),
     handleLocalInsert: (...args) => handleLocalInsert(...args),
+    handleLocalDelete: (...args) => handleLocalDelete(...args),
     handleRemoteInsert: (...args) => handleRemoteInsert(...args),
     findCharToLeft: (...args) => findCharToLeft(...args),
     findCharToRight: (...args) => findCharToRight(...args)

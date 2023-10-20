@@ -1,6 +1,6 @@
 // Import React dependencies.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation } from 'slate';
+import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor, Node } from 'slate';
 import { Editable, Slate, withReact } from 'slate-react';
 import { eventBus } from '../lib/events/create-eventbus';
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from '../lib/types/BroadcastEventTypes';
@@ -16,10 +16,28 @@ type PropsType = {
     siteId: number
 }
 
+const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
+    const { apply } = editor
+    editor.apply = operation => {
+        // console.log(Text.isText(editor.children[0]))
+        // console.log(Text.isText(editor.children[0].children[0]))
+        if (['remove_text', 'merge_node', 'remove_node'].includes(operation.type)) {
+            // if (operation.type === 'merge_node') {
+            //     const gen = Node.texts(editor, { from: [operation.path[0] - 1], to: operation.path })
+            //     const list = [...gen]
+            //     console.log(list)
+            // }
+            CrdtInterface.handleLocalDelete(crdt, editor, [operation])
+        }
+
+        apply(operation)
+    }
+    return editor
+}
 
 const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     // is it possible
-    const [editor] = useState(withReact(createEditor()))
+    const [editor] = useState(withReact(withCustomRemoveOperation(createEditor(), crdt)))
     const [crdtState, setCrdt] = useState(crdt)
     const [peerIdState, setPeerId] = useState<string>(peerId)
     const [siteIdState, setSiteId] = useState(siteId)
@@ -27,10 +45,7 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     const [initalValue, setInitalValue] = useState<Descendant[]>(
         [
             {
-                children: [{ text: 'One line of text in a paragraph.', characters: [] }],
-            },
-            {
-                children: [{ text: 'Two line of text in a paragraph.', characters: [] }],
+                children: [{ text: '', characters: [] }],
             },
         ]
     )
@@ -65,9 +80,14 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
 
     return (
         <Slate editor={editor} initialValue={initalValue} onChange={(decendant) => {
+            console.log('----run--')
             console.log(editor.children)
+            console.log(editor.operations)
+            // console.log(editor.selection)
+            console.log('----run--')
             if (editor.operations[0]?.type === 'insert_text' || editor.operations[0]?.type === 'split_node') {
                 const ops = editor.operations
+
                 if (!remote.current) {
                     const char: Char = CrdtInterface.handleLocalInsert(crdt, editor, ops)
                     const payload: BroadcastCrdtEvent = {
@@ -80,7 +100,25 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
                 }
             }
         }}>
-            <Editable />
+            <Editable onPaste={(event) => {
+                // console.log(editor.selection)
+                const clipboardData = event.clipboardData
+                const pastedText = clipboardData.getData('text/plain');
+                const characters = pastedText.split('')
+                // paste work on range
+                // so we need to delete the stuff inside the selection
+                // we don't have the logic for removing yet.
+                // then start inserting character at the location
+                characters.forEach(val => {
+                    const ops = [{
+                        type: 'insert_text',
+                        path: editor.selection?.anchor.path,
+                        offset: 1
+                    }]
+                    // CrdtInterface.handleLocalInsert(crdt,editor,ops)
+                })
+                event.preventDefault()
+            }} />
         </Slate>
     )
 }
