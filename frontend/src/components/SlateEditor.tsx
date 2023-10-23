@@ -1,6 +1,6 @@
 // Import React dependencies.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor, Node } from 'slate';
+import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor } from 'slate';
 import { Editable, Slate, withReact } from 'slate-react';
 import { eventBus } from '../lib/events/create-eventbus';
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from '../lib/types/BroadcastEventTypes';
@@ -11,6 +11,7 @@ import { BroadcastOperation } from '../types/BroadcastOperation';
 import { Char, CharInterface } from '../lib/interfaces/Char';
 import { Editor as CustomEditor } from '../lib/interfaces/Editor';
 import { RemoveTextOperation } from '../lib/types/RemoveTextOperation';
+import { InsertTextOperation } from '../lib/types/InsertTextOperation';
 type PropsType = {
     crdt: Crdt,
     peerId: string,
@@ -32,10 +33,26 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
                     }
                     eventBus.emit('delete', payload)
                 })
-
             }
         }
         apply(operation)
+        // } else if (['insert_text', 'split_node'].includes(operation.type)) {
+        //     apply(operation)
+        //     const insertedChars: Char[] = CrdtInterface.handleLocalInsert(crdt, editor, [operation])
+        //     if (!(operation as InsertTextOperation).isRemoteOperation) {
+        //         insertedChars.forEach(char => {
+        //             const payload: BroadcastCrdtEvent = {
+        //                 siteId: crdt.siteId,
+        //                 peerId: crdt.peerId as string,
+        //                 type: 'delete',
+        //                 char: char
+        //             }
+        //             eventBus.emit('delete', payload)
+        //         })
+
+        //     }
+
+        // }
     }
     return editor
 }
@@ -95,44 +112,29 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
             console.log('----run--')
             console.log(editor.children)
             console.log(editor.operations)
-            // console.log(editor.selection)
+            console.log(editor.selection)
             console.log('----run--')
             if (editor.operations[0]?.type === 'insert_text' || editor.operations[0]?.type === 'split_node') {
-                const ops = editor.operations
+                // const ops = editor.operations
 
-                if (!remote.current) {
-                    const char: Char = CrdtInterface.handleLocalInsert(crdt, editor, ops)
-                    const payload: BroadcastCrdtEvent = {
-                        siteId: siteIdState,
-                        peerId: peerIdState,
-                        type: 'insert',
-                        char: char
-                    }
-                    eventBus.emit('insert', payload)
-                }
+                // if (!remote.current) {
+                //     const char: Char[] = CrdtInterface.handleLocalInsert(crdt, editor, ops)
+                //     const payload: BroadcastCrdtEvent = {
+                //         siteId: siteIdState,
+                //         peerId: peerIdState,
+                //         type: 'insert',
+                //         char: char
+                //     }
+                //     eventBus.emit('insert', payload)
+                // }
             }
         }}>
             <Editable onPaste={(event) => {
-                // console.log(editor.selection)
-                const clipboardData = event.clipboardData
-                const pastedText = clipboardData.getData('text/plain');
-                const characters = pastedText.split('')
-                // paste work on range
-                // so we need to delete the stuff inside the selection
-                // we don't have the logic for removing yet.
-                // then start inserting character at the location
-                // characters.forEach(val => {
-                //     const ops = [{
-                //         type: 'insert_text',
-                //         path: editor.selection?.anchor.path,
-                //         offset: 1
-                //     }]
-                // })
+                // CrdtInterface.handleLocalPaste(crdt, editor, event)
                 // event.preventDefault()
-            }} />
+            }} onCut={event => event.preventDefault()} />
         </Slate>
     )
 }
 
-export default SlateEditor;
-
+export default SlateEditor

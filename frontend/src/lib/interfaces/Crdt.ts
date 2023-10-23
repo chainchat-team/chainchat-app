@@ -8,6 +8,7 @@ import { findCharToRight } from "../crdt/findCharToRight";
 import { handleRemoteInsert } from "../crdt/handleRemoteInsert";
 import { handleLocalDelete } from "../crdt/handleLocalDelete";
 import { handleRemoteDelete } from "../crdt/handleRemoteDelete";
+import { handleLocalPaste } from "../crdt/handleLocalPaste";
 export interface Crdt {
     // Core state
     base: number
@@ -23,8 +24,9 @@ export interface Crdt {
 export interface CrdtInterface {
     retrieveStrategy: (crdt: Crdt, depth: number) => boolean;
     generateChar: (crdt: Crdt, char1: Char, char2: Char, value: string) => Char
-    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char
+    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
     handleLocalDelete: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
+    handleLocalPaste: (crtd: Crdt, editor: Editor, event: React.ClipboardEvent) => void
     handleRemoteInsert: (crtd: Crdt, editor: Editor, char: Char) => void
     handleRemoteDelete: (crtd: Crdt, editor: Editor, char: Char) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
@@ -36,6 +38,7 @@ export const CrdtInterface: CrdtInterface = {
     retrieveStrategy: (...args) => retrieveStrategy(...args),
     handleLocalInsert: (...args) => handleLocalInsert(...args),
     handleLocalDelete: (...args) => handleLocalDelete(...args),
+    handleLocalPaste: (...args) => handleLocalPaste(...args),
     handleRemoteInsert: (...args) => handleRemoteInsert(...args),
     handleRemoteDelete: (...args) => handleRemoteDelete(...args),
     findCharToLeft: (...args) => findCharToLeft(...args),
