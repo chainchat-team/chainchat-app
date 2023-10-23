@@ -12,6 +12,9 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
         eventBus.on('insert', (data: BroadcastCrdtEvent) => {
             connection.send(data as PeerCrdtEvent)
         })
+        eventBus.on('delete', (data: BroadcastCrdtEvent) => {
+            connection.send(data as PeerCrdtEvent)
+        })
         connection.send({
             type: 'connRequest',
             peerId: peer.id,

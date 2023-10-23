@@ -10,6 +10,7 @@ import { Crdt, CrdtInterface } from '../lib/interfaces/Crdt';
 import { BroadcastOperation } from '../types/BroadcastOperation';
 import { Char, CharInterface } from '../lib/interfaces/Char';
 import { Editor as CustomEditor } from '../lib/interfaces/Editor';
+import { RemoveTextOperation } from '../lib/types/RemoveTextOperation';
 type PropsType = {
     crdt: Crdt,
     peerId: string,
@@ -20,7 +21,19 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
     const { apply } = editor
     editor.apply = operation => {
         if (['remove_text', 'merge_node', 'remove_node'].includes(operation.type)) {
-            CrdtInterface.handleLocalDelete(crdt, editor, [operation])
+            const removedChars: Char[] = CrdtInterface.handleLocalDelete(crdt, editor, [operation])
+            if (!(operation as RemoveTextOperation).isRemoteOperation) {
+                removedChars.forEach(char => {
+                    const payload: BroadcastCrdtEvent = {
+                        siteId: crdt.siteId,
+                        peerId: crdt.peerId as string,
+                        type: 'delete',
+                        char: char
+                    }
+                    eventBus.emit('delete', payload)
+                })
+
+            }
         }
         apply(operation)
     }
@@ -59,6 +72,13 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
                 remote.current = true
                 await CrdtInterface.handleRemoteInsert(crdt, editor, operation.char)
                 remote.current = false
+            } else if (operation.type === 'delete') {
+                // I don't want handRemoteDelete to fire another event back to the sender
+                // it will fire another event because. `handleRemoteDelete` -> .apply -> handleLocalDelete (which fires)
+                console.log('------handling remote delete-----')
+                console.log(operation)
+                console.log('------handling remote delete-----')
+                CrdtInterface.handleRemoteDelete(crdt, editor, operation.char)
             }
         }
         eventBus.on('handleRemoteOperation', handleRemoteOperation)
@@ -101,15 +121,14 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
                 // so we need to delete the stuff inside the selection
                 // we don't have the logic for removing yet.
                 // then start inserting character at the location
-                characters.forEach(val => {
-                    const ops = [{
-                        type: 'insert_text',
-                        path: editor.selection?.anchor.path,
-                        offset: 1
-                    }]
-                    // CrdtInterface.handleLocalInsert(crdt,editor,ops)
-                })
-                event.preventDefault()
+                // characters.forEach(val => {
+                //     const ops = [{
+                //         type: 'insert_text',
+                //         path: editor.selection?.anchor.path,
+                //         offset: 1
+                //     }]
+                // })
+                // event.preventDefault()
             }} />
         </Slate>
     )

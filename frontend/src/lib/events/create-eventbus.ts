@@ -19,6 +19,7 @@ type Events = {
 
     //editor -> broadcast
     'insert': BroadcastCrdtEvent
+    'delete': BroadcastCrdtEvent
 
 
 

@@ -7,12 +7,14 @@ import { findCharToLeft } from "../crdt/findCharToLeft";
 import { findCharToRight } from "../crdt/findCharToRight";
 import { handleRemoteInsert } from "../crdt/handleRemoteInsert";
 import { handleLocalDelete } from "../crdt/handleLocalDelete";
+import { handleRemoteDelete } from "../crdt/handleRemoteDelete";
 export interface Crdt {
     // Core state
     base: number
     boundary: number
     siteId: number
     strategyCache: boolean[]
+    peerId: string | null
     //methods
     insertChar: (editor: Editor, char: Char, point: Point) => void;
     splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
@@ -24,6 +26,7 @@ export interface CrdtInterface {
     handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char
     handleLocalDelete: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
     handleRemoteInsert: (crtd: Crdt, editor: Editor, char: Char) => void
+    handleRemoteDelete: (crtd: Crdt, editor: Editor, char: Char) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
 }
@@ -34,6 +37,7 @@ export const CrdtInterface: CrdtInterface = {
     handleLocalInsert: (...args) => handleLocalInsert(...args),
     handleLocalDelete: (...args) => handleLocalDelete(...args),
     handleRemoteInsert: (...args) => handleRemoteInsert(...args),
+    handleRemoteDelete: (...args) => handleRemoteDelete(...args),
     findCharToLeft: (...args) => findCharToLeft(...args),
     findCharToRight: (...args) => findCharToRight(...args)
 

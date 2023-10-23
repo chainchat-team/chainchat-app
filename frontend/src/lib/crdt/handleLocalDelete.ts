@@ -1,6 +1,8 @@
 import { BaseOperation, Editor, RemoveTextOperation, Transforms, Text, Node, Descendant } from "slate";
 import { Crdt } from "../interfaces/Crdt";
 import { Char } from "../interfaces/Char";
+import { eventBus } from "../events/create-eventbus";
+import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
 
 export function handleLocalDelete(crdt: Crdt, editor: Editor, operations: BaseOperation[]): Char[] {
     const acceptedOperations = ['remove_text', 'remove_node', 'merge_node']
@@ -68,9 +70,7 @@ export function handleLocalDelete(crdt: Crdt, editor: Editor, operations: BaseOp
             cache.push((topNode as any).characters[length - 1])
         }
     }
-    console.log('---handleLocalDelete----')
-    console.log(cache)
-    console.log('---handleLocalDelete----')
-    return []
 
+
+    return cache
 }

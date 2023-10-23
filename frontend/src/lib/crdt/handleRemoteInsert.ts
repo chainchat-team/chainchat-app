@@ -10,9 +10,6 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
     //this line is giving me a infinite loop
     const offset = CharInterface.findInsertIndex(char, leafNode.characters)
 
-    console.log(editor.children)
-    console.log(char)
-    console.log({ path: path, offset: offset })
 
     let ops: BaseOperation[] = []
     if (char.value !== '\n') {

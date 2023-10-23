@@ -13,6 +13,9 @@ export function handleIncomingConnection(broadcast: Broadcast, peer: Peer) {
             eventBus.on('insert', (data: BroadcastCrdtEvent) => {
                 connection.send(data as PeerCrdtEvent)
             })
+            eventBus.on('delete', (data: BroadcastCrdtEvent) => {
+                connection.send(data as PeerCrdtEvent)
+            })
             connection.on('data', (data: any) => {
                 console.log(data)
                 switch (data.type) {
