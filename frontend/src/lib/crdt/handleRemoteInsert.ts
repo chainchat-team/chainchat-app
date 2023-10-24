@@ -1,6 +1,8 @@
-import { BaseOperation, Editor, InsertTextOperation, SplitNodeOperation, withoutNormalizing } from "slate";
+import { BaseOperation, Editor, withoutNormalizing } from "slate";
 import { Crdt, CrdtInterface } from "../interfaces/Crdt";
 import { Char, CharInterface } from "../interfaces/Char";
+import { InsertTextOperation } from "../types/InsertTextOperation";
+import { SplitNodeOperation } from "../types/SplitNodeOperation";
 export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void {
     console.log('---handleRemoteInsert-----')
     const path = CharInterface.findEditorPath(char, editor)
@@ -17,7 +19,9 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
             type: 'insert_text',
             path: path,
             offset: offset,
-            text: char.value
+            text: char.value,
+            isRemoteOperation: true,
+            char: char
         }
         ops.push(insertTextOperation)
     } else {
@@ -25,7 +29,9 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
             type: 'split_node',
             path: path,
             position: offset,
-            properties: { characters: leafNode.characters } as Partial<Node>
+            properties: { characters: leafNode.characters } as Partial<Node>,
+            isRemoteOperation: true,
+            char: char
         }
 
         const splitAtBlock: SplitNodeOperation = {
@@ -33,6 +39,8 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
             path: leafNodePath.slice(0, leafNodePath.length - 1),
             position: 1,
             properties: {},
+            isRemoteOperation: true,
+            char: char
         }
         ops.push(splitAtLeaf)
         ops.push(splitAtBlock)
@@ -42,10 +50,5 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
         ops.forEach(op => editor.apply(op))
     })
 
-    if (char.value === '\n') {
-        crdt.splitLine(editor, ops as SplitNodeOperation[])
-    }
-    crdt.insertChar(editor, char, { path: path, offset: offset })
-    console.log(editor.children)
     console.log('---handleRemoteInsert-----')
 }

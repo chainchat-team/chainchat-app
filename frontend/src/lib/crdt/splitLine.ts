@@ -2,12 +2,11 @@ import { Editor, SplitNodeOperation, Transforms } from "slate";
 import { Char } from "../interfaces/Char";
 
 export function splitLine(editor: Editor, operations: SplitNodeOperation[]): void {
-    if (operations.length < 2) {
-        throw new Error(`Failed to split line. Passed operation array length is ${operations.length} but needs to be 2.`)
+    if (operations.length > 1) {
+        throw new Error(`Failed to split line. Passed operation array length is ${operations.length} but needs to be 1.`)
     }
     const newNode1Path: number[] = [...operations[0].path]
-    const newNode2Path: number[] = [...operations[1].path].map((val, idx, arr) => (idx === arr.length - 1 ? val + 1 : val))
-    newNode2Path.push(0)
+    const newNode2Path: number[] = [...operations[0].path].map((val, idx, arr) => (idx === arr.length - 1 ? val + 1 : val))
     const [leafNode1, path1] = Editor.leaf(editor, newNode1Path)
     const [leafNode2, path2] = Editor.leaf(editor, newNode2Path)
 

@@ -1,6 +1,6 @@
 // Import React dependencies.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor } from 'slate';
+import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor, RemoveNodeOperation, MergeNodeOperation } from 'slate';
 import { Editable, Slate, withReact } from 'slate-react';
 import { eventBus } from '../lib/events/create-eventbus';
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from '../lib/types/BroadcastEventTypes';
@@ -21,38 +21,43 @@ type PropsType = {
 const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
     const { apply } = editor
     editor.apply = operation => {
-        if (['remove_text', 'merge_node', 'remove_node'].includes(operation.type)) {
-            const removedChars: Char[] = CrdtInterface.handleLocalDelete(crdt, editor, [operation])
-            if (!(operation as RemoveTextOperation).isRemoteOperation) {
-                removedChars.forEach(char => {
-                    const payload: BroadcastCrdtEvent = {
-                        siteId: crdt.siteId,
-                        peerId: crdt.peerId as string,
-                        type: 'delete',
-                        char: char
-                    }
-                    eventBus.emit('delete', payload)
-                })
-            }
+        let chars: Char[] = [];
+        switch (operation.type) {
+            case 'insert_text':
+                apply(operation)
+                chars = CrdtInterface.handleInsertTextOp(crdt, editor, [operation])
+                break
+            case 'split_node':
+                apply(operation)
+                chars = CrdtInterface.handleSplitNodeOp(crdt, editor, [operation])
+                break
+            case 'remove_text':
+                chars = CrdtInterface.handleRemoveTextOp(crdt, editor, [operation])
+                apply(operation)
+                break
+            case 'remove_node':
+                chars = CrdtInterface.handleRemoveNodeOp(crdt, editor, [operation as RemoveNodeOperation])
+                apply(operation)
+                break
+            case 'merge_node':
+                chars = CrdtInterface.handleMergeNodeOp(crdt, editor, [operation as MergeNodeOperation])
+                apply(operation)
+                break
+            default:
+                apply(operation)
         }
-        apply(operation)
-        // } else if (['insert_text', 'split_node'].includes(operation.type)) {
-        //     apply(operation)
-        //     const insertedChars: Char[] = CrdtInterface.handleLocalInsert(crdt, editor, [operation])
-        //     if (!(operation as InsertTextOperation).isRemoteOperation) {
-        //         insertedChars.forEach(char => {
-        //             const payload: BroadcastCrdtEvent = {
-        //                 siteId: crdt.siteId,
-        //                 peerId: crdt.peerId as string,
-        //                 type: 'delete',
-        //                 char: char
-        //             }
-        //             eventBus.emit('delete', payload)
-        //         })
-
-        //     }
-
-        // }
+        const eventType = ['remove_text', 'remove_node', 'merge_node'].includes(operation.type) ? 'delete' : 'insert'
+        if (!(operation as RemoveTextOperation).isRemoteOperation) {
+            chars.forEach(char => {
+                const payload: BroadcastCrdtEvent = {
+                    siteId: crdt.siteId,
+                    peerId: crdt.peerId as string,
+                    type: eventType,
+                    char: char
+                }
+                eventBus.emit(eventType, payload)
+            })
+        }
     }
     return editor
 }
@@ -112,27 +117,13 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
             console.log('----run--')
             console.log(editor.children)
             console.log(editor.operations)
-            console.log(editor.selection)
+            // console.log(editor.selection)
             console.log('----run--')
-            if (editor.operations[0]?.type === 'insert_text' || editor.operations[0]?.type === 'split_node') {
-                // const ops = editor.operations
-
-                // if (!remote.current) {
-                //     const char: Char[] = CrdtInterface.handleLocalInsert(crdt, editor, ops)
-                //     const payload: BroadcastCrdtEvent = {
-                //         siteId: siteIdState,
-                //         peerId: peerIdState,
-                //         type: 'insert',
-                //         char: char
-                //     }
-                //     eventBus.emit('insert', payload)
-                // }
-            }
         }}>
             <Editable onPaste={(event) => {
-                // CrdtInterface.handleLocalPaste(crdt, editor, event)
-                // event.preventDefault()
-            }} onCut={event => event.preventDefault()} />
+                CrdtInterface.handleLocalPaste(crdt, editor, event)
+                event.preventDefault()
+            }} onCut={event => console.log('trying to cut')} />
         </Slate>
     )
 }

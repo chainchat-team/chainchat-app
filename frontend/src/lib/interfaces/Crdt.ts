@@ -1,4 +1,4 @@
-import { BaseOperation, Editor, Point, SplitNodeOperation } from "slate";
+import { BaseOperation, Editor, MergeNodeOperation, Point, RemoveNodeOperation, RemoveTextOperation } from "slate";
 import { Char } from "./Char";
 import { generateChar } from "../crdt/generateChar";
 import { retrieveStrategy } from "../crdt/retrieveStrategy";
@@ -9,6 +9,13 @@ import { handleRemoteInsert } from "../crdt/handleRemoteInsert";
 import { handleLocalDelete } from "../crdt/handleLocalDelete";
 import { handleRemoteDelete } from "../crdt/handleRemoteDelete";
 import { handleLocalPaste } from "../crdt/handleLocalPaste";
+import { handleInsertTextOp } from "../crdt/handleInsertTextOp";
+import { handleSplitNodeOp } from "../crdt/handleSplitNodeOp";
+import { handleRemoveTextOp } from "../crdt/handleRemoveTextOp";
+import { handleRemoveNodeOp } from "../crdt/handleRemoveNodeOp";
+import { handleMergeNodeOp } from "../crdt/handleMergeNodeOp";
+import { InsertTextOperation } from "../types/InsertTextOperation";
+import { SplitNodeOperation } from "../types/SplitNodeOperation";
 export interface Crdt {
     // Core state
     base: number
@@ -31,6 +38,13 @@ export interface CrdtInterface {
     handleRemoteDelete: (crtd: Crdt, editor: Editor, char: Char) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
+
+    /*--*/
+    handleInsertTextOp: (crtd: Crdt, editor: Editor, operation: InsertTextOperation[]) => Char[]
+    handleSplitNodeOp: (crtd: Crdt, editor: Editor, operation: SplitNodeOperation[]) => Char[]
+    handleRemoveTextOp: (crtd: Crdt, editor: Editor, operation: RemoveTextOperation[]) => Char[]
+    handleRemoveNodeOp: (crtd: Crdt, editor: Editor, operation: RemoveNodeOperation[]) => Char[]
+    handleMergeNodeOp: (crtd: Crdt, editor: Editor, operation: MergeNodeOperation[]) => Char[]
 }
 
 export const CrdtInterface: CrdtInterface = {
@@ -41,6 +55,11 @@ export const CrdtInterface: CrdtInterface = {
     handleLocalPaste: (...args) => handleLocalPaste(...args),
     handleRemoteInsert: (...args) => handleRemoteInsert(...args),
     handleRemoteDelete: (...args) => handleRemoteDelete(...args),
+    handleInsertTextOp: (...args) => handleInsertTextOp(...args),
+    handleRemoveTextOp: (...args) => handleRemoveTextOp(...args),
+    handleRemoveNodeOp: (...args) => handleRemoveNodeOp(...args),
+    handleMergeNodeOp: (...args) => handleMergeNodeOp(...args),
+    handleSplitNodeOp: (...args) => handleSplitNodeOp(...args),
     findCharToLeft: (...args) => findCharToLeft(...args),
     findCharToRight: (...args) => findCharToRight(...args)
 
