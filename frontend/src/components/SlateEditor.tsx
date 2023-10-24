@@ -123,7 +123,7 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
             <Editable onPaste={(event) => {
                 CrdtInterface.handleLocalPaste(crdt, editor, event)
                 event.preventDefault()
-            }} onCut={event => console.log('trying to cut')} />
+            }} />
         </Slate>
     )
 }
