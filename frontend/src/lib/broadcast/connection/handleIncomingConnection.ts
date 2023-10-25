@@ -26,11 +26,12 @@ export function handleIncomingConnection(broadcast: Broadcast, peer: Peer) {
                                 siteId: broadcast.siteId,
                                 peerId: peer.id,
                                 initialStruct: initialStruct,
+                                // version: 
                             };
                             connection.send(initialData);
                         });
                         eventBus.emit('request_initial_struct');
-
+                        break
                     default:
                         eventBus.emit('handleRemoteOperation', data as BroadcastCrdtEvent)
                         break;

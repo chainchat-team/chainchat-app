@@ -3,8 +3,12 @@ import { Crdt, CrdtInterface } from "../interfaces/Crdt";
 import { Char, CharInterface } from "../interfaces/Char";
 import { InsertTextOperation } from "../types/InsertTextOperation";
 import { SplitNodeOperation } from "../types/SplitNodeOperation";
-export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void {
+import { VersionVector, VersionVectorInterface } from "../interfaces/VersionVector";
+import { Version } from "../interfaces/Version";
+import { eventBus } from "../events/create-eventbus";
+export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char, version: Version): void {
     console.log('---handleRemoteInsert-----')
+
     const path = CharInterface.findEditorPath(char, editor)
     //find the leaf node at the path
 
@@ -21,7 +25,7 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
             offset: offset,
             text: char.value,
             isRemoteOperation: true,
-            char: char
+            char: char,
         }
         ops.push(insertTextOperation)
     } else {
@@ -49,6 +53,9 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char): void
     withoutNormalizing(editor, () => {
         ops.forEach(op => editor.apply(op))
     })
+
+    const versionVector: VersionVector = VersionVectorInterface.update(crdt.versionVector, version)
+    CrdtInterface.setVersionVector(crdt, versionVector)
 
     console.log('---handleRemoteInsert-----')
 }

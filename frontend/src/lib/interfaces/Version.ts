@@ -1,15 +1,16 @@
+import { update } from "../version/update"
+
 export interface Version {
-    siteId: number,
-    counter: number,
-    exceptions: number[]
+    siteId: string
+    counter: number
+    exceptions?: number[]
 }
 
 export interface VersionInterface {
-    update: (version: number) => void
+    update: (version: Version, otherVersion: Version) => Version
 }
 
-export const VersionInterface: VersionInterface = {
-    update: (version: number) => {
 
-    }
+export const VersionInterface: VersionInterface = {
+    update: (...args) => update(...args)
 }

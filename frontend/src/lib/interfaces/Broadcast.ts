@@ -14,7 +14,7 @@ export interface Broadcast {
     outgoingConnections: DataConnection[]
     incomingConnections: DataConnection[]
     max_buffer_size: number
-    siteId: number
+    siteId: string
 
 }
 

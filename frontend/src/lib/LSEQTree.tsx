@@ -2,7 +2,7 @@ import { Queue } from "typescript-collections";
 
 export type Identifier = {
     digit: number,
-    siteId: number,
+    siteId: string,
 }
 
 export type TreeNode = {
@@ -28,10 +28,10 @@ export type LSEQTreeSerializable = {
 class LSEQTree {
     strategyCache: boolean[];
     root: TreeNode;
-    siteId: number
+    siteId: string
     base: number
     boundary: number
-    constructor(siteId: number, base: number = 32, boundary: number = 10) {
+    constructor(siteId: string, base: number = 32, boundary: number = 10) {
         this.strategyCache = [];
         this.siteId = siteId;
         this.base = base;

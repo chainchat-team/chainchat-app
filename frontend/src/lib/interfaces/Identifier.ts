@@ -1,6 +1,6 @@
 export interface Identifier {
     digit: number;
-    siteId: number;
+    siteId: string;
 }
 
 export interface IdentifierInterface {

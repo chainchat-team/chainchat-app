@@ -25,8 +25,10 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
             switch (data.type) {
                 case 'syncRequest':
                     eventBus.emit('handleSyncRequest', data as BroadcastSyncRequestEvent)
+                    break
                 default:
                     eventBus.emit('handleRemoteOperation', data as BroadcastCrdtEvent)
+                    break
             }
         })
         connection.on('error', () => { })

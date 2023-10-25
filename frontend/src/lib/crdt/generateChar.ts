@@ -51,7 +51,7 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
     const newChar: Char = {
         identifiers: identifiers,
         value: value,
-        counter: 1,
+        counter: crtd.versionVector.localVersion.counter,
         siteId: crtd.siteId
     }
     return newChar

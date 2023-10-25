@@ -1,12 +1,14 @@
 import { BaseOperation, Editor, withoutNormalizing } from "slate";
-import { Crdt } from "../interfaces/Crdt";
+import { Crdt, CrdtInterface } from "../interfaces/Crdt";
 import { Char, CharInterface } from "../interfaces/Char";
 import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
 import { RemoveTextOperation } from "../types/RemoveTextOperation";
 import { MergeNodeOperation } from "../types/MergeNodeOperation";
 import { SetSelectionOperation } from "../types/SetSelectionOperation";
+import { Version } from "../interfaces/Version";
+import { VersionVector, VersionVectorInterface } from "../interfaces/VersionVector";
 
-export function handleRemoteDelete(crdt: Crdt, editor: Editor, char: Char): void {
+export function handleRemoteDelete(crdt: Crdt, editor: Editor, char: Char, version: Version): void {
     //find the leaf node at the path
     const path = CharInterface.findEditorPath(char, editor)
     const [leafNode, leafNodePath] = Editor.leaf(editor, path) as [any, any]
@@ -63,5 +65,7 @@ export function handleRemoteDelete(crdt: Crdt, editor: Editor, char: Char): void
     withoutNormalizing(editor, () => {
         ops.forEach(op => editor.apply(op))
     })
+    const versionVector: VersionVector = VersionVectorInterface.update(crdt.versionVector, version)
+    CrdtInterface.setVersionVector(crdt, versionVector)
 
 }

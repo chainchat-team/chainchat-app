@@ -4,7 +4,7 @@ import { eventBus } from "../events/create-eventbus"
 
 export const createBroadcast = (
     peer: Peer,
-    siteId: number,
+    siteId: string,
     targetPeerId: string
 ) => {
     const broadcast: Broadcast = {

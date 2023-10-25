@@ -5,7 +5,7 @@ import PeerId from './components/PeerId.tsx';
 import { createBroadcast } from './lib/broadcast/create-broadcast.ts';
 import Peer from 'peerjs';
 import { createCrdt } from './lib/create-crdt.ts';
-
+import { v1 as UUID } from 'uuid';
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -28,9 +28,9 @@ const peer = new Peer({
   port: 4000,
   path: '/server',
 })
-const siteId = 1
+const siteId = UUID()
 const broadcast = createBroadcast(peer, siteId, targetPeerId)
-const crdt = createCrdt()
+const crdt = createCrdt(siteId)
 
 
 const App = () => {

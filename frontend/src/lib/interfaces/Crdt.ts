@@ -16,13 +16,19 @@ import { handleRemoveNodeOp } from "../crdt/handleRemoveNodeOp";
 import { handleMergeNodeOp } from "../crdt/handleMergeNodeOp";
 import { InsertTextOperation } from "../types/InsertTextOperation";
 import { SplitNodeOperation } from "../types/SplitNodeOperation";
+import { VersionVector } from "./VersionVector";
+import { setVersionVector } from "../crdt/setVersionVector";
+import { increment } from "../versionvector/increment";
+import { incrementLocalVersion, incrementVersionVector } from "../crdt/incrementVersionVector";
+import { Version } from "./Version";
 export interface Crdt {
     // Core state
     base: number
     boundary: number
-    siteId: number
+    siteId: string
     strategyCache: boolean[]
     peerId: string | null
+    versionVector: VersionVector
     //methods
     insertChar: (editor: Editor, char: Char, point: Point) => void;
     splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
@@ -31,20 +37,26 @@ export interface Crdt {
 export interface CrdtInterface {
     retrieveStrategy: (crdt: Crdt, depth: number) => boolean;
     generateChar: (crdt: Crdt, char1: Char, char2: Char, value: string) => Char
-    handleLocalInsert: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
-    handleLocalDelete: (crtd: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
-    handleLocalPaste: (crtd: Crdt, editor: Editor, event: React.ClipboardEvent) => void
-    handleRemoteInsert: (crtd: Crdt, editor: Editor, char: Char) => void
-    handleRemoteDelete: (crtd: Crdt, editor: Editor, char: Char) => void
+    handleLocalInsert: (crdt: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
+    handleLocalDelete: (crdt: Crdt, editor: Editor, operation: BaseOperation[]) => Char[]
+    handleLocalPaste: (crdt: Crdt, editor: Editor, event: React.ClipboardEvent) => void
+    handleRemoteInsert: (crdt: Crdt, editor: Editor, char: Char, version: Version) => void
+    handleRemoteDelete: (crdt: Crdt, editor: Editor, char: Char, version: Version) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
 
     /*--*/
-    handleInsertTextOp: (crtd: Crdt, editor: Editor, operation: InsertTextOperation[]) => Char[]
-    handleSplitNodeOp: (crtd: Crdt, editor: Editor, operation: SplitNodeOperation[]) => Char[]
-    handleRemoveTextOp: (crtd: Crdt, editor: Editor, operation: RemoveTextOperation[]) => Char[]
-    handleRemoveNodeOp: (crtd: Crdt, editor: Editor, operation: RemoveNodeOperation[]) => Char[]
-    handleMergeNodeOp: (crtd: Crdt, editor: Editor, operation: MergeNodeOperation[]) => Char[]
+    handleInsertTextOp: (crdt: Crdt, editor: Editor, operation: InsertTextOperation[]) => Char[]
+    handleSplitNodeOp: (crdt: Crdt, editor: Editor, operation: SplitNodeOperation[]) => Char[]
+    handleRemoveTextOp: (crdt: Crdt, editor: Editor, operation: RemoveTextOperation[]) => Char[]
+    handleRemoveNodeOp: (crdt: Crdt, editor: Editor, operation: RemoveNodeOperation[]) => Char[]
+    handleMergeNodeOp: (crdt: Crdt, editor: Editor, operation: MergeNodeOperation[]) => Char[]
+
+    /** */
+    setVersionVector: (crdt: Crdt, versionVector: VersionVector) => void
+    incrementVersionVector: (crdt: Crdt) => void
+
+
 }
 
 export const CrdtInterface: CrdtInterface = {
@@ -61,6 +73,7 @@ export const CrdtInterface: CrdtInterface = {
     handleMergeNodeOp: (...args) => handleMergeNodeOp(...args),
     handleSplitNodeOp: (...args) => handleSplitNodeOp(...args),
     findCharToLeft: (...args) => findCharToLeft(...args),
-    findCharToRight: (...args) => findCharToRight(...args)
-
+    findCharToRight: (...args) => findCharToRight(...args),
+    setVersionVector: (...args) => setVersionVector(...args),
+    incrementVersionVector: (...args) => incrementVersionVector(...args)
 }

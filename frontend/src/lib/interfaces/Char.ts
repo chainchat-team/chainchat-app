@@ -7,7 +7,7 @@ export interface Char {
     identifiers: Identifier[];
     value: string;
     counter: number;
-    siteId: number;
+    siteId: string;
 }
 
 export interface CharInterface {
