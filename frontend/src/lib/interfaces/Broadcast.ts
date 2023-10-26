@@ -20,8 +20,8 @@ export interface Broadcast {
 
 export interface BroadcastInterface {
     // bindServerEvents: (boardcast: Broadcast, targetPeerId: number) => void;
-    addOutGoingConnection: (broadcast: Broadcast, connection: DataConnection) => Broadcast;
-    addIncomingConnection: (broadcast: Broadcast, connection: DataConnection) => Broadcast;
+    addOutGoingConnection: (broadcast: Broadcast, connection: DataConnection) => void;
+    addIncomingConnection: (broadcast: Broadcast, connection: DataConnection) => void;
     // processOutgoingBuffer: (broadcast: Broadcast, connection: DataConnection) => void;
     // acceptConnRequest: (broadcast: Broadcast, peerId: string, siteId: string) => void;
     handleIncomingConnection: (broadcast: Broadcast, peer: Peer) => void;

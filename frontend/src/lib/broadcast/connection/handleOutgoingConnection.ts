@@ -10,10 +10,13 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
         BroadcastInterface.addIncomingConnection(broadcast, connection)
         BroadcastInterface.addOutGoingConnection(broadcast, connection)
         eventBus.on('insert', (data: BroadcastCrdtEvent) => {
-            connection.send(data as PeerCrdtEvent)
+            // console.log(broadcast.incomingConnections)
+            broadcast.outgoingConnections.forEach(conn => conn.send(data as PeerCrdtEvent))
+            // connection.send(data as PeerCrdtEvent)
         })
         eventBus.on('delete', (data: BroadcastCrdtEvent) => {
-            connection.send(data as PeerCrdtEvent)
+            // connection.send(data as PeerCrdtEvent)
+            broadcast.outgoingConnections.forEach(conn => conn.send(data as PeerCrdtEvent))
         })
         connection.send({
             type: 'connRequest',
