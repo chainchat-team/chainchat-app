@@ -7,6 +7,8 @@ import { handleIncomingConnection } from "../broadcast/connection/handleIncoming
 import { handleOutgoingConnection } from "../broadcast/connection/handleOutgoingConnection"
 import { sendOperation } from "../broadcast/sendOperation"
 import { BroadcastOperation } from "../../types/BroadcastOperation"
+import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes"
+import { PeerCrdtEvent } from "../types/PeerEventTypes"
 
 export interface Broadcast {
     peer: Peer,
@@ -26,7 +28,7 @@ export interface BroadcastInterface {
     // acceptConnRequest: (broadcast: Broadcast, peerId: string, siteId: string) => void;
     handleIncomingConnection: (broadcast: Broadcast, peer: Peer) => void;
     handleOutgoingConnection: (broadcast: Broadcast, peer: Peer, targetPeerId: string) => void;
-    sendOperation: (broadcast: Broadcast, operations: BroadcastOperation) => void;
+    sendOperation: (broadcast: Broadcast, operations: PeerCrdtEvent) => void;
 }
 
 export const BroadcastInterface: BroadcastInterface = {

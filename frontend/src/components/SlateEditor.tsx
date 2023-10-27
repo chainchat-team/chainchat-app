@@ -13,6 +13,7 @@ import { Editor as CustomEditor } from '../lib/interfaces/Editor';
 import { VersionInterface } from '../lib/interfaces/Version';
 import { VersionVector, VersionVectorInterface } from '../lib/interfaces/VersionVector';
 import { CustomOperation, MergeNodeOperation, RemoveNodeOperation, RemoveTextOperation } from '../lib/types/Operation';
+import { NetworkInterface } from '../lib/interfaces/Network';
 type PropsType = {
     crdt: Crdt,
     peerId: string,

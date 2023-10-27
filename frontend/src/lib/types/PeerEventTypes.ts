@@ -1,5 +1,6 @@
 import { Descendant } from "../../types/Descendant"
 import { Char } from "../interfaces/Char"
+import { Network } from "../interfaces/Network"
 import { Version } from "../interfaces/Version"
 
 export type BasePeerEvent = {
@@ -11,7 +12,7 @@ export type BasePeerEvent = {
 export type PeerSyncRequestEvent = {
     initialStruct: Descendant[],
     // initialVersions: TBD,
-    // network: TBD,
+    network: Partial<Network>,
 } & BasePeerEvent
 
 
@@ -21,4 +22,4 @@ export type PeerCrdtEvent = {
 } & BasePeerEvent
 
 
-export type PeerEvent = PeerSyncRequestEvent | PeerCrdtEvent
+export type PeerEvent = PeerSyncRequestEvent | PeerCrdtEvent | BasePeerEvent
