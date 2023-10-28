@@ -7,13 +7,14 @@ import { PeerCrdtEvent, PeerEvent } from "../../types/PeerEventTypes";
 export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targetId: string) {
     const connection: DataConnection = peer.connect(targetId)
     connection.on('open', () => {
-        // BroadcastInterface.addIncomingConnection(broadcast, connection)
-        BroadcastInterface.addOutGoingConnection(broadcast, connection)
         eventBus.on('insert', (data: BroadcastCrdtEvent) => {
-            broadcast.outgoingConnections.forEach(conn => conn.send(data as PeerCrdtEvent))
+            console.log('--inserting---')
+            console.log(connection.peerConnection.iceConnectionState)
+            console.log('--inserting---')
+            broadcast.outgoingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
         })
         eventBus.on('delete', (data: BroadcastCrdtEvent) => {
-            broadcast.outgoingConnections.forEach(conn => conn.send(data as PeerCrdtEvent))
+            broadcast.outgoingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
         })
         connection.send({
             type: 'connRequest',
@@ -21,20 +22,34 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
             siteId: broadcast.siteId
         })
         connection.on('data', (data: any) => {
+            console.log(data)
             switch (data.type) {
                 case 'syncRequest':
+                    BroadcastInterface.addOutGoingConnection(broadcast,
+                        {
+                            peerId: data.peerId,
+                            siteId: data.siteId,
+                            connection: connection
+                        }
+                    )
                     eventBus.emit('handleSyncRequest', data as BroadcastSyncRequestEvent)
                     eventBus.emit('initNetwork', data.network)
                     break
                 case 'addToNetwork':
-                    const payload = {
-                        peerToBeAdded: { peerId: data.peerId, siteId: data.siteId },
-                        peerSender: { peerId: connection.peer, siteId: data.siteId }
-                    }
-                    eventBus.emit('addToNetwork', payload)
+                    eventBus.emit('addToNetwork',
+                        {
+                            peerToBeAdded: data.peerToBeAdded,
+                            peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                        }
+                    )
                     break
                 case 'removeFromNetwork':
-                    eventBus.emit('removeFromNetwork', { peerId: data.peerId, siteId: data.siteId })
+                    eventBus.emit('removeFromNetwork',
+                        {
+                            peerToBeRemoved: data.peerToBeRemoved,
+                            peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                        }
+                    )
                     break
                 default:
                     eventBus.emit('handleRemoteOperation', data as BroadcastCrdtEvent)
@@ -43,6 +58,15 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
         })
         connection.on('error', () => { })
         connection.on('close', () => {
+            console.log('--onClose-----')
+            console.log('--onClose-----')
+            const peerToBeRemoved = BroadcastInterface.getOutgoingPeer(broadcast, connection)
+            eventBus.emit('removeFromNetwork',
+                {
+                    peerToBeRemoved: peerToBeRemoved,
+                    peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                }
+            )
         })
     })
 

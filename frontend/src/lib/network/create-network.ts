@@ -6,12 +6,23 @@ export const createNetwork = (): Network => {
     const network: Network = {
         globalPeers: []
     }
-    eventBus.on('addToNetwork', ({ peerToBeAdded }) => {
+    eventBus.on('addToNetwork', ({ peerToBeAdded, peerSender }) => {
         const isAdded = NetworkInterface.addToNetwork(network, peerToBeAdded)
+        if (!!isAdded) {
+            eventBus.emit('broadcastAddToNetwork', { peerToBeAdded: peerToBeAdded, peerSender: peerSender })
+        }
     })
-    eventBus.on('removeFromNetwork', peer => {
-        const isRemoved = NetworkInterface.removeFromNetwork(network, peer)
-        eventBus.emit('removeFromNetworkResponse', isRemoved)
+    eventBus.on('removeFromNetwork', ({ peerToBeRemoved, peerSender }) => {
+
+        const isRemoved = NetworkInterface.removeFromNetwork(network, peerToBeRemoved)
+        console.log('-----removeFromNetwork-----')
+        console.log(peerToBeRemoved)
+        console.log(isRemoved)
+        console.log(network.globalPeers)
+        console.log('-----removeFromNetwork-----')
+        if (!!isRemoved) {
+            eventBus.emit('broadcastRemoveFromNetwork', { peerToBeRemoved: peerToBeRemoved, peerSender: peerSender })
+        }
     })
     eventBus.on('requestNetwork', () => {
         eventBus.emit('responseNetwork', { globalPeers: network.globalPeers })

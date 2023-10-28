@@ -7,6 +7,7 @@ import Peer from 'peerjs';
 import { createCrdt } from './lib/create-crdt.ts';
 import { v1 as UUID } from 'uuid';
 import { createNetwork } from './lib/network/create-network.ts';
+import { BroadcastInterface } from './lib/interfaces/Broadcast.ts';
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -33,6 +34,10 @@ const siteId = UUID()
 const network = createNetwork()
 const broadcast = createBroadcast(peer, siteId, targetPeerId)
 const crdt = createCrdt(siteId)
+
+window.addEventListener('beforeunload', function (event) {
+  BroadcastInterface.close(broadcast)
+});
 
 
 const App = () => {

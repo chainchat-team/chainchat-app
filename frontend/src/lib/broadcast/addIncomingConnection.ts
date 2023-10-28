@@ -1,6 +1,7 @@
 import { DataConnection } from "peerjs";
 import { Broadcast } from "../interfaces/Broadcast";
+import { Peer } from "../types/Peer";
 
-export function addIncomingConnection(broadcast: Broadcast, connection: DataConnection): void {
-    broadcast.incomingConnections = [...broadcast.incomingConnections, connection]
+export function addIncomingConnection(broadcast: Broadcast, peer: Peer): void {
+    broadcast.incomingConnections = [...broadcast.incomingConnections, peer]
 }

@@ -89,9 +89,6 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     useEffect(() => {
         // initialize the editor
         const initialStructlistener = (req: BroadcastSyncRequestEvent) => {
-            console.log('---received----')
-            console.log(req)
-            console.log('---received----')
             editor.children = req.initialStruct
             setInitalValue(req.initialStruct)
         }

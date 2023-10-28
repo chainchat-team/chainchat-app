@@ -12,7 +12,7 @@ export function removeFromNetwork(network: Network, partialPeer: Partial<Peer>):
     }
     network.globalPeers = [
         ...network.globalPeers.slice(0, index),
-        ...network.globalPeers.slice(index)
+        ...network.globalPeers.slice(index + 1)
     ]
     return peer
 }

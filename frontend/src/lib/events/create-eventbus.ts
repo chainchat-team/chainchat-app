@@ -17,13 +17,13 @@ type Events = {
 
     //broadcast -> network
     'addToNetwork': { peerToBeAdded: Peer, peerSender: Peer },
-    'removeFromNetwork': Peer,
+    'removeFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer },
     'requestNetwork': void,
     'initNetwork': Network
 
     //network -> broadcast
-    'addToNetworkResponse': Peer | null,
-    'removeFromNetworkResponse': Peer | null,
+    'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer }
+    'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer }
     'responseNetwork': Partial<Network>
 
     //contoller -> editor

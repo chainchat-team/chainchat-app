@@ -2,6 +2,7 @@ import { Descendant } from "../../types/Descendant"
 import { Char } from "../interfaces/Char"
 import { Network } from "../interfaces/Network"
 import { Version } from "../interfaces/Version"
+import { Peer } from "./Peer"
 
 export type BasePeerEvent = {
     type: string,
@@ -14,6 +15,16 @@ export type PeerSyncRequestEvent = {
     // initialVersions: TBD,
     network: Partial<Network>,
 } & BasePeerEvent
+
+export type PeerAddToNetworkEvent = {
+    peerToBeAdded: Peer
+} & BasePeerEvent
+
+export type PeerRemoveFromNetworkEvent = {
+    peerToBeRemoved: Peer
+} & BasePeerEvent
+
+
 
 
 export type PeerCrdtEvent = {

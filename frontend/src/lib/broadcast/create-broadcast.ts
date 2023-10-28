@@ -1,7 +1,7 @@
 import Peer from "peerjs"
 import { Broadcast, BroadcastInterface } from "../interfaces/Broadcast"
 import { eventBus } from "../events/create-eventbus"
-import { BasePeerEvent } from "../types/PeerEventTypes"
+import { BasePeerEvent, PeerAddToNetworkEvent, PeerRemoveFromNetworkEvent } from "../types/PeerEventTypes"
 
 export const createBroadcast = (
     peer: Peer,
@@ -18,41 +18,44 @@ export const createBroadcast = (
     }
     peer.on('open', (id: string) => {
         eventBus.emit('peerId', broadcast.peer.id)
-        eventBus.on('addToNetwork', ({ peerToBeAdded, peerSender }) => {
-            const payload: BasePeerEvent = {
+        eventBus.on('broadcastAddToNetwork', ({ peerToBeAdded, peerSender }) => {
+            // only tell you peers this has been added
+            const payload: PeerAddToNetworkEvent = {
                 type: 'addToNetwork',
-                siteId: peerToBeAdded.siteId,
-                peerId: peerToBeAdded.peerId
+                siteId: peerSender.siteId, // this should be the id of the whoever send the request
+                peerId: peerSender.peerId,
+                peerToBeAdded: { peerId: peerToBeAdded.peerId, siteId: peerToBeAdded.siteId }
             }
-            broadcast.outgoingConnections.forEach(conn => {
-                if (conn.peer !== peerToBeAdded.peerId && conn.peer !== peerSender.peerId) {
-                    conn.send(payload)
+            broadcast.outgoingConnections.forEach(peer => {
+                if (![peerToBeAdded.peerId, peerSender.peerId].includes(peer.peerId)) {
+                    peer.connection?.send(payload)
                 }
             })
-            broadcast.incomingConnections.forEach(conn => {
-                if (conn.peer !== peerToBeAdded.peerId && conn.peer !== peerSender.peerId) {
-                    conn.send(payload)
+            broadcast.incomingConnections.forEach(peer => {
+                if (![peerToBeAdded.peerId, peerSender.peerId].includes(peer.peerId)) {
+                    peer.connection?.send(payload)
                 }
             })
         })
-        eventBus.on('removeFromNetworkResponse', peer => {
-            if (!!peer) {
-                const payload: BasePeerEvent = {
-                    type: 'removeFromNetwork',
-                    siteId: peer.siteId,
-                    peerId: peer.peerId
-                }
-                broadcast.outgoingConnections.forEach(conn => {
-                    if (conn.peer !== peer.peerId) {
-                        conn.send(payload)
-                    }
-                })
-                broadcast.incomingConnections.forEach(conn => {
-                    if (conn.peer !== peer.peerId) {
-                        conn.send(payload)
-                    }
-                })
+        eventBus.on('broadcastRemoveFromNetwork', ({ peerToBeRemoved, peerSender }) => {
+            const payload: PeerRemoveFromNetworkEvent = {
+                type: 'removeFromNetwork',
+                siteId: peerSender.siteId,
+                peerId: peerSender.peerId,
+                peerToBeRemoved: { peerId: peerToBeRemoved.peerId, siteId: peerToBeRemoved.siteId }
             }
+            BroadcastInterface.removeIngoingConnection(broadcast, peerToBeRemoved)
+            BroadcastInterface.removeOutgoingConnection(broadcast, peerToBeRemoved)
+            broadcast.outgoingConnections.forEach(peer => {
+                if (![peerToBeRemoved.peerId, peerSender.peerId].includes(peer.peerId)) {
+                    peer.connection?.send(payload)
+                }
+            })
+            broadcast.incomingConnections.forEach(peer => {
+                if (![peerToBeRemoved.peerId, peerSender.peerId].includes(peer.peerId)) {
+                    peer.connection?.send(payload)
+                }
+            })
         })
         const payload = {
             peerToBeAdded: { peerId: id, siteId: siteId },
@@ -64,9 +67,11 @@ export const createBroadcast = (
         if (targetPeerId !== '0') {
             BroadcastInterface.handleOutgoingConnection(broadcast, peer, targetPeerId)
         }
-        eventBus.on('insert', (data) => {
-            BroadcastInterface.sendOperation(broadcast, data)
-        })
+
+        // setInterval(() => {
+        //     BroadcastInterface.closeDeadPeers(broadcast)
+        // }, 5000)
+
     })
     return broadcast
 }
