@@ -34,7 +34,10 @@ type Events = {
     'insert': BroadcastCrdtEvent
     'delete': BroadcastCrdtEvent
 
-
+    // for testing
+    'requestCurrentTarget': void
+    'responseCurrentTarget': Peer | null
+    'initNetworkComplete': Network
 
 
 

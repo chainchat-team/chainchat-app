@@ -35,9 +35,6 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     )
                     break
                 case 'removeFromNetwork':
-                    console.log('---data-remoteFromNetwor----')
-                    console.log(data.peerToBeRemoved)
-                    console.log('---data-remoteFromNetwor----')
                     eventBus.emit('removeFromNetwork',
                         {
                             peerToBeRemoved: data.peerToBeRemoved,
@@ -54,17 +51,17 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
         connection.on('close', () => {
             if (!broadcast._isCloser) {
                 const peerToBeRemoved = BroadcastInterface.getOutgoingPeer(broadcast, connection)
-                console.log('--onClose-----')
-                console.log(peerToBeRemoved)
-                console.log('--onClose-----')
+                const broadcastRemoveFromNetworkListener = (payload: any) => {
+                    BroadcastInterface.findNewTarget(broadcast)
+                    eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+                }
+                eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
                 eventBus.emit('removeFromNetwork',
                     {
                         peerToBeRemoved: peerToBeRemoved,
                         peerSender: { peerId: peer.id, siteId: broadcast.siteId }
                     }
                 );
-                // BroadcastInterface.findNewTarget(broadcast)
-
             }
         });
     })

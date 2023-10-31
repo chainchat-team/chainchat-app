@@ -77,21 +77,21 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
 
         });
 
-        connection.on('error', () => { console.log('some error') });
+        // connection.on('error', () => { console.log('some error') });
         connection.on('close', () => {
-            window.alert('close event recived')
-            console.log('---close---')
-            console.log(`received close from ${connection.peer}`)
-            console.log('---close---')
             if (!broadcast._isCloser) {
                 const peerToBeRemoved = BroadcastInterface.getIncomingPeer(broadcast, connection)
+                const broadcastRemoveFromNetworkListener = (payload: any) => {
+                    BroadcastInterface.findNewTarget(broadcast)
+                    eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+                }
+                eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
                 eventBus.emit('removeFromNetwork',
                     {
                         peerToBeRemoved: peerToBeRemoved,
                         peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
                     }
                 );
-                // BroadcastInterface.findNewTarget(broadcast)
             }
         });
 

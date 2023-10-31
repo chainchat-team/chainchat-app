@@ -78,6 +78,17 @@ export const createBroadcast = (
             BroadcastInterface.handleOutgoingConnection(broadcast, peer, targetPeerId)
         }
 
+        eventBus.on('requestCurrentTarget', () => {
+            if (broadcast.outgoingConnections.length > 1) {
+                throw new Error('More than 1 peer found in the brodcast outgoing connection.')
+            }
+            if (broadcast.outgoingConnections.length === 0) {
+                eventBus.emit('responseCurrentTarget', null)
+            } else {
+                eventBus.emit('responseCurrentTarget', broadcast.outgoingConnections[0])
+            }
+
+        })
         // setInterval(() => {
         //     BroadcastInterface.closeDeadPeers(broadcast)
         // }, 5000)

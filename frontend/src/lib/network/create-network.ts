@@ -36,6 +36,7 @@ export const createNetwork = (): Network => {
     })
     eventBus.on('initNetwork', (initNetwork: Network) => {
         NetworkInterface.initNetwork(network, initNetwork)
+        eventBus.emit('initNetworkComplete', network)
     })
 
     return network
