@@ -24,7 +24,7 @@ type Events = {
     //network -> broadcast
     'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer }
     'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer }
-    'responseNetwork': Partial<Network>
+    'responseNetwork': Network
 
     //contoller -> editor
     'editorInitialValue': Descendant[],

@@ -15,6 +15,7 @@ import { getIncomingPeer } from "../broadcast/getIncomingPeer"
 import { getOutgoingPeer } from "../broadcast/getOutgoingPeer"
 import { closeDeadPeers } from "../broadcast/closeDeadPeer"
 import { close } from "../broadcast/close"
+import { findNewTarget } from "../broadcast/findNewTarget"
 
 export interface Broadcast {
     peer: PeerJs,
@@ -23,6 +24,7 @@ export interface Broadcast {
     incomingConnections: Peer[]
     max_buffer_size: number
     siteId: string
+    _isCloser: boolean
 
 }
 
@@ -38,6 +40,7 @@ export interface BroadcastInterface {
     // acceptConnRequest: (broadcast: Broadcast, peerId: string, siteId: string) => void;
     handleIncomingConnection: (broadcast: Broadcast, peer: PeerJs) => void;
     handleOutgoingConnection: (broadcast: Broadcast, peer: PeerJs, targetPeerId: string) => void;
+    findNewTarget: (broadcast: Broadcast) => void
     sendOperation: (broadcast: Broadcast, operations: PeerCrdtEvent) => void;
     closeDeadPeers: (broadcast: Broadcast) => void
     close: (broadcast: Broadcast) => void
@@ -54,6 +57,7 @@ export const BroadcastInterface: BroadcastInterface = {
     // processOutgoingBuffer: (...args) => processOutgoingBuffer(...args),
     handleIncomingConnection: (...args) => handleIncomingConnection(...args),
     handleOutgoingConnection: (...args) => handleOutgoingConnection(...args),
+    findNewTarget: (...args) => findNewTarget(...args),
     sendOperation: (...args) => sendOperation(...args),
     closeDeadPeers: (...args) => closeDeadPeers(...args),
     close: (...args) => close(...args)

@@ -1,7 +1,8 @@
 import Peer from "peerjs"
 import { Broadcast, BroadcastInterface } from "../interfaces/Broadcast"
 import { eventBus } from "../events/create-eventbus"
-import { BasePeerEvent, PeerAddToNetworkEvent, PeerRemoveFromNetworkEvent } from "../types/PeerEventTypes"
+import { BasePeerEvent, PeerAddToNetworkEvent, PeerCrdtEvent, PeerRemoveFromNetworkEvent } from "../types/PeerEventTypes"
+import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes"
 
 export const createBroadcast = (
     peer: Peer,
@@ -15,9 +16,18 @@ export const createBroadcast = (
         incomingConnections: [],
         max_buffer_size: 10,
         siteId: siteId,
+        _isCloser: false
     }
     peer.on('open', (id: string) => {
         eventBus.emit('peerId', broadcast.peer.id)
+        eventBus.on('insert', (data: BroadcastCrdtEvent) => {
+            broadcast.outgoingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
+            broadcast.incomingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
+        })
+        eventBus.on('delete', (data: BroadcastCrdtEvent) => {
+            broadcast.outgoingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
+            broadcast.incomingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
+        })
         eventBus.on('broadcastAddToNetwork', ({ peerToBeAdded, peerSender }) => {
             // only tell you peers this has been added
             const payload: PeerAddToNetworkEvent = {

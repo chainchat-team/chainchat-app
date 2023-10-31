@@ -10,18 +10,7 @@ import { Peer } from "../../types/Peer";
 
 export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
     peerjs.on('connection', (connection: DataConnection) => {
-        // BroadcastInterface.addOutGoingConnection(broadcast, connection)
         connection.on('open', () => {
-            eventBus.on('insert', (data: BroadcastCrdtEvent) => {
-                console.log('--inserting---')
-                console.log(connection.peerConnection.iceConnectionState)
-                console.log('--inserting---')
-                console.log(broadcast.incomingConnections)
-                broadcast.incomingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
-            })
-            eventBus.on('delete', (data: BroadcastCrdtEvent) => {
-                broadcast.incomingConnections.forEach(peer => peer.connection?.send(data as PeerCrdtEvent))
-            })
 
         });
         connection.on('data', (data: any) => {
@@ -46,9 +35,6 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                             network: network
                         };
                         connection.send(initialData);
-                        console.log('---conrequest----')
-                        console.log(data)
-                        console.log('---conrequest----')
                         const payload = {
                             peerToBeAdded: { peerId: data.peerId, siteId: data.siteId },
                             peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
@@ -74,6 +60,9 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                     )
                     break
                 case 'removeFromNetwork':
+                    console.log('---data-remoteFromNetwor----')
+                    console.log(data.peerToBeRemoved)
+                    console.log('---data-remoteFromNetwor----')
                     eventBus.emit('removeFromNetwork',
                         {
                             peerToBeRemoved: data.peerToBeRemoved,
@@ -90,13 +79,21 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
 
         connection.on('error', () => { console.log('some error') });
         connection.on('close', () => {
-            const peerToBeRemoved = BroadcastInterface.getIncomingPeer(broadcast, connection)
-            eventBus.emit('removeFromNetwork',
-                {
-                    peerToBeRemoved: peerToBeRemoved,
-                    peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
-                }
-            )
+            window.alert('close event recived')
+            console.log('---close---')
+            console.log(`received close from ${connection.peer}`)
+            console.log('---close---')
+            if (!broadcast._isCloser) {
+                const peerToBeRemoved = BroadcastInterface.getIncomingPeer(broadcast, connection)
+                eventBus.emit('removeFromNetwork',
+                    {
+                        peerToBeRemoved: peerToBeRemoved,
+                        peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
+                    }
+                );
+                // BroadcastInterface.findNewTarget(broadcast)
+            }
         });
+
     });
 }

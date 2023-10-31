@@ -8,6 +8,7 @@ import { createCrdt } from './lib/create-crdt.ts';
 import { v1 as UUID } from 'uuid';
 import { createNetwork } from './lib/network/create-network.ts';
 import { BroadcastInterface } from './lib/interfaces/Broadcast.ts';
+import NetworkList from './components/NetworkList.tsx';
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -45,6 +46,7 @@ const App = () => {
     // <RouterProvider router={router} />
     <>
       <PeerId />
+      <NetworkList />
       <SlateEditor crdt={crdt} peerId={peer.id} siteId={siteId} />
     </>
   )
