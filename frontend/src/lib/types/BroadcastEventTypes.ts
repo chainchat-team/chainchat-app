@@ -2,6 +2,7 @@ import { Descendant } from "../../types/Descendant"
 import { Char } from "../interfaces/Char"
 import { Network } from "../interfaces/Network"
 import { Version } from "../interfaces/Version"
+import { VersionVector } from "../interfaces/VersionVector"
 
 export type BaseBroadcastEvent = {
     type: string,
@@ -11,7 +12,7 @@ export type BaseBroadcastEvent = {
 
 export type BroadcastSyncRequestEvent = {
     initialStruct: Descendant[],
-    // version: Version,
+    versionVector: Partial<VersionVector>,
     network: Partial<Network>
 } & BaseBroadcastEvent
 

@@ -69,11 +69,6 @@ export function findEditorPath(char: Char, editor: SlateEditor): Path {
     const [topLeaf, topLeafPath] = Editor.last(editor, [top])
     const topLeafPathLength = (topLeaf as any).characters.length;
     const topLeafLastChar = (topLeaf as any).characters[topLeafPathLength - 1]
-    console.log('---topleaf----')
-    console.log(topLeaf)
-    console.log(topLeafLastChar)
-    console.log(CharInterface.compareTo(char, topLeafLastChar))
-    console.log('---topleaf----')
     if (CharInterface.compareTo(char, topLeafLastChar) <= 0) {
         console.log('returning top!!')
         return topLeafPath

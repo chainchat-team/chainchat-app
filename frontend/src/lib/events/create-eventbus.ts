@@ -4,12 +4,17 @@ import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../types/Broadcas
 import { BroadcastOperation } from "../../types/BroadcastOperation"
 import { Peer } from "../types/Peer"
 import { Network } from "../interfaces/Network"
+import { VersionVector } from "../interfaces/VersionVector"
 type Events = {
+    //crdt -> broadcast
+    'responseVersionVector': Partial<VersionVector>
     //broadcast -> controller
     'updateControllerUrlid': string,
     'request_initial_struct': void,
     'response_initial_struct': Descendant[],
     'handleSyncRequest': BroadcastSyncRequestEvent,
+    //broadcast -> crdt
+    'requestVersionVector': void
 
     //broadcast -> components
     'peerId': string,

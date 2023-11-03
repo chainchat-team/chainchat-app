@@ -6,6 +6,7 @@ import { BroadcastCrdtEvent, BroadcastEvent, BroadcastSyncRequestOperation } fro
 import { PeerCrdtEvent, PeerEvent, PeerSyncRequestEvent } from "../../types/PeerEventTypes";
 import { Network } from "../../interfaces/Network";
 import { Peer } from "../../types/Peer";
+import { VersionVector } from "../../interfaces/VersionVector";
 
 
 export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
@@ -25,13 +26,14 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                         }
                     )
                     var network: Partial<Network>;
+                    var versionVector: Partial<VersionVector>;
                     const responseInitialStructListener = (initalStruct: Descendant[]) => {
                         const initialData: PeerSyncRequestEvent = {
                             type: 'syncRequest',
                             siteId: broadcast.siteId,
                             peerId: peerjs.id,
                             initialStruct: initalStruct,
-                            // version: 
+                            versionVector: versionVector,
                             network: network
                         };
                         connection.send(initialData);
@@ -43,11 +45,17 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                         eventBus.off('response_initial_struct', responseInitialStructListener)
                     }
                     eventBus.on('response_initial_struct', responseInitialStructListener);
+                    const responseVersionVectorListener = (argVersionVector: Partial<VersionVector>) => {
+                        versionVector = argVersionVector
+                        eventBus.emit('request_initial_struct');
+                        eventBus.off('responseVersionVector', responseVersionVectorListener)
+                    }
                     const responseNetworkListener = (argNetwork: Partial<Network>) => {
                         network = argNetwork
-                        eventBus.emit('request_initial_struct');
+                        eventBus.emit('requestVersionVector');
                         eventBus.off('responseNetwork', responseNetworkListener)
                     }
+                    eventBus.on('responseVersionVector', responseVersionVectorListener)
                     eventBus.on('responseNetwork', responseNetworkListener)
                     eventBus.emit('requestNetwork')
                     break

@@ -21,6 +21,10 @@ import { setVersionVector } from "../crdt/setVersionVector";
 import { increment } from "../versionvector/increment";
 import { incrementLocalVersion, incrementVersionVector } from "../crdt/incrementVersionVector";
 import { Version } from "./Version";
+import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
+import { addToDeletionBuffer } from "../crdt/addToDeletionBuffer";
+import { removeFromDeletionBuffer } from "../crdt/removeFromDeletionBuffer";
+import { processDeletionBuffer } from "../crdt/processDeletionBuffer";
 export interface Crdt {
     // Core state
     base: number
@@ -29,6 +33,7 @@ export interface Crdt {
     strategyCache: boolean[]
     peerId: string | null
     versionVector: VersionVector
+    deletionBuffer: BroadcastCrdtEvent[]
     //methods
     insertChar: (editor: Editor, char: Char, point: Point) => void;
     splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
@@ -56,6 +61,10 @@ export interface CrdtInterface {
     setVersionVector: (crdt: Crdt, versionVector: VersionVector) => void
     incrementVersionVector: (crdt: Crdt) => void
 
+    /** Deletion buffer */
+    addToDeletionBuffer: (crdt: Crdt, operation: BroadcastCrdtEvent) => void
+    removeFromDeletionBuffer: (crdt: Crdt, operation: BroadcastCrdtEvent) => BroadcastCrdtEvent | null
+    processDeletionBuffer: (crdt: Crdt, editor: Editor) => void
 
 }
 
@@ -75,5 +84,8 @@ export const CrdtInterface: CrdtInterface = {
     findCharToLeft: (...args) => findCharToLeft(...args),
     findCharToRight: (...args) => findCharToRight(...args),
     setVersionVector: (...args) => setVersionVector(...args),
-    incrementVersionVector: (...args) => incrementVersionVector(...args)
+    incrementVersionVector: (...args) => incrementVersionVector(...args),
+    addToDeletionBuffer: (...args) => addToDeletionBuffer(...args),
+    removeFromDeletionBuffer: (...args) => removeFromDeletionBuffer(...args),
+    processDeletionBuffer: (...args) => processDeletionBuffer(...args)
 }

@@ -27,13 +27,10 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
         switch (operation.type) {
             case 'insert_text':
                 apply(operation)
-                if (!(operation as CustomOperation).isRemoteOperation) CrdtInterface.incrementVersionVector(crdt)
                 chars = CrdtInterface.handleInsertTextOp(crdt, editor, [operation])
                 break
             case 'split_node':
                 apply(operation)
-                if (!(operation as CustomOperation).isRemoteOperation) CrdtInterface.incrementVersionVector(crdt)
-                crdt.versionVector
                 chars = CrdtInterface.handleSplitNodeOp(crdt, editor, [operation])
                 break
             case 'remove_text':
@@ -45,7 +42,6 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
                 apply(operation)
                 break
             case 'merge_node':
-                CrdtInterface.incrementVersionVector(crdt)
                 chars = CrdtInterface.handleMergeNodeOp(crdt, editor, [operation])
                 apply(operation)
                 break
@@ -100,19 +96,17 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
         eventBus.on('request_initial_struct', responseInitialStruct)
 
         const handleRemoteOperation = async (operation: BroadcastCrdtEvent) => {
-            console.log('---handleRemoteOperation----')
-            console.log(operation)
-            console.log(VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version))
+            console.log('---handleRemoteOperation-start----')
             if (VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version)) return
-            // operation.version is undefined. becuase syncREquset
             if (operation.type === 'insert') {
                 await CrdtInterface.handleRemoteInsert(crdt, editor, operation.char, operation.version)
-                eventBus.emit(operation.type, operation)
             } else if (operation.type === 'delete') {
-                CrdtInterface.handleRemoteDelete(crdt, editor, operation.char, operation.version)
-                eventBus.emit(operation.type, operation)
+                CrdtInterface.addToDeletionBuffer(crdt, operation)
             }
-            console.log('---handleRemoteOperation----')
+            await CrdtInterface.processDeletionBuffer(crdt, editor)
+            const operationType = operation.type === 'insert' ? 'insert' : 'delete'
+            eventBus.emit(operationType, operation)
+            console.log('---handleRemoteOperation--end----')
         }
         eventBus.on('handleRemoteOperation', handleRemoteOperation)
 
@@ -129,6 +123,7 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
             console.log(editor.children)
             console.log(editor.operations)
             // console.log(editor.selection)
+            console.log(crdt.deletionBuffer)
             console.log('----run--')
         }}>
             <Editable onPaste={(event) => {
