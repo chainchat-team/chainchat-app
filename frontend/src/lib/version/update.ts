@@ -29,5 +29,10 @@ export function update(version: Version, otherVersion: Version): Version {
             exceptions: updatedExceptions
         }
     }
+    console.log('---update version---')
+    console.log(version)
+    console.log(otherVersion)
+    console.log(updatedVersion)
+    console.log('---update version---')
     return updatedVersion
 }

@@ -3,7 +3,7 @@ import { VersionVector } from "../interfaces/VersionVector";
 
 export function getLocalVersion(versionVector: VersionVector): Version {
     return {
-        siteId: versionVector.localVersion.siteId,
+        peer: versionVector.localVersion.peer,
         counter: versionVector.localVersion.counter
     }
 }

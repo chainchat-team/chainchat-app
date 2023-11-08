@@ -52,6 +52,7 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
         if (!(operation as CustomOperation).isRemoteOperation) {
             const eventType = ['remove_text', 'remove_node', 'merge_node'].includes(operation.type) ? 'delete' : 'insert'
             chars.forEach(char => {
+                if (crdt.versionVector === null) throw new Error('Crdt version vector is null.')
                 CrdtInterface.incrementVersionVector(crdt)
                 const payload: BroadcastCrdtEvent = {
                     siteId: crdt.siteId,
@@ -67,8 +68,14 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
     return editor
 }
 
+const withEventBusPlugIn = (editor: BaseEditor) => {
+    console.log('---withEventsBusPlugIn---')
+    return editor
+}
+
 const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     // is it possible
+    // const [editor] = useState(withReact(withEventBusPlugIn(withCustomRemoveOperation(createEditor(), crdt))))
     const [editor] = useState(withReact(withCustomRemoveOperation(createEditor(), crdt)))
     // const [editor] = useState(withReact(createEditor()))
     const [crdtState, setCrdt] = useState(crdt)
@@ -94,6 +101,12 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
             eventBus.emit('response_initial_struct', editor.children)
         }
         eventBus.on('request_initial_struct', responseInitialStruct)
+        eventBus.on('requestEditorDescendant', () => {
+            console.log('--requestEditorDescendant----')
+            console.log(editor.children)
+            console.log('--requestEditorDescendant----')
+            eventBus.emit('responseEditorDescendant', editor.children)
+        })
 
         const handleRemoteOperation = async (operation: BroadcastCrdtEvent) => {
             console.log('---handleRemoteOperation-start----')

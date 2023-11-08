@@ -1,16 +1,13 @@
 import react, { useEffect, useState } from 'react';
 import { eventBus } from '../lib/events/create-eventbus';
-const PeerId = () => {
-    const [PeerId, setPeerId] = useState<string>('')
-    useEffect(() => {
-        const listener = (id: string) => { setPeerId(id) }
-        eventBus.on('peerId', listener);
-        return () => {
-            eventBus.off('peerId', listener)
-        }
-    }, [PeerId])
+type PropsType = {
+    peerId: string | null
+}
+const PeerId = ({ peerId }: PropsType) => {
     return (
-        <span>Your Id: {PeerId}</span>
+        <>
+            {peerId ? (<span> Your Id: {peerId}</span >) : (<span>Peer id is null</span>)}
+        </>
     )
 }
 

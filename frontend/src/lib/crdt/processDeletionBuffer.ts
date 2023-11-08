@@ -18,3 +18,4 @@ export async function processDeletionBuffer(crdt: Crdt, editor: Editor) {
     // Replace the original buffer with the filtered copy
     crdt.deletionBuffer = deletionBufferCopy.filter((_, index) => !appliedOperationsIdx.includes(index));
 }
+

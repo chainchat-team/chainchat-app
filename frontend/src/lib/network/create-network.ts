@@ -1,43 +1,80 @@
 import { eventBus } from "../events/create-eventbus"
 import { Network, NetworkInterface } from "../interfaces/Network"
+import { VersionVectorInterface } from "../interfaces/VersionVector"
 import { Peer } from "../types/Peer"
+import { Peer as PeerJs } from 'peerjs'
 
-export const createNetwork = (): Network => {
+export const createNetwork = (peerjs: PeerJs, siteId: string): Network => {
     const network: Network = {
-        globalPeers: []
+        globalPeers: [],
+        versionVector: null,
+        peerConnectionsCount: {}
     }
-    eventBus.on('addToNetwork', ({ peerToBeAdded, peerSender }) => {
-        const isAdded = NetworkInterface.addToNetwork(network, peerToBeAdded)
-        console.log('-----New-addToNetwork-----')
-        console.log(peerToBeAdded)
-        console.log(isAdded)
-        console.log(network.globalPeers)
-        console.log('-----addToNetwork-----')
-
-        if (!!isAdded) {
-            eventBus.emit('broadcastAddToNetwork', { peerToBeAdded: peerToBeAdded, peerSender: peerSender })
+    peerjs.on('open', (id: string) => {
+        const peer: Peer = { siteId: siteId, peerId: id }
+        network.peerConnectionsCount[id] = 0
+        network.versionVector = {
+            versions: [{ peer: peer, counter: 0, exceptions: [] }],
+            localVersion: { peer: peer, counter: 0, exceptions: [] }
         }
-    })
-    eventBus.on('removeFromNetwork', ({ peerToBeRemoved, peerSender }) => {
+        network.globalPeers.push(peer)
 
-        const isRemoved = NetworkInterface.removeFromNetwork(network, peerToBeRemoved)
-        console.log('-----removeFromNetwork-----')
-        console.log(peerToBeRemoved)
-        console.log(peerSender)
-        console.log(isRemoved)
-        console.log(network.globalPeers)
-        console.log('-----removeFromNetwork-----')
-        if (!!isRemoved) {
-            eventBus.emit('broadcastRemoveFromNetwork', { peerToBeRemoved: peerToBeRemoved, peerSender: peerSender })
-        }
-    })
-    eventBus.on('requestNetwork', () => {
-        eventBus.emit('responseNetwork', network)
-    })
-    eventBus.on('initNetwork', (initNetwork: Network) => {
-        NetworkInterface.initNetwork(network, initNetwork)
-        eventBus.emit('initNetworkComplete', network)
-    })
+        eventBus.on('addToNetwork', ({ peerToBeAdded, peerSender, networkVersion }) => {
+            if (network.versionVector === null) throw new Error('Network version vector is null.')
+            if (VersionVectorInterface.hasBeenApplied(network.versionVector, networkVersion)) return
+            const isAdded = NetworkInterface.addToNetwork(network, peerToBeAdded)
 
+            if (network.versionVector.localVersion.peer.peerId === networkVersion.peer.peerId) {
+                network.versionVector = VersionVectorInterface.increment(network.versionVector)
+            } else {
+                network.versionVector = VersionVectorInterface.update(network.versionVector, networkVersion)
+            }
+            if (!!isAdded) {
+                const peerCount = network.peerConnectionsCount[networkVersion.peer.peerId] || 0
+                network.peerConnectionsCount[networkVersion.peer.peerId] = peerCount + 1
+                eventBus.emit('broadcastAddToNetwork', { peerToBeAdded: peerToBeAdded, peerSender: peerSender, networkVersion: networkVersion })
+                eventBus.emit('updateNetwork', network)
+            }
+        })
+        eventBus.on('removeFromNetwork', ({ peerToBeRemoved, peerSender }) => {
+            const isRemoved = NetworkInterface.removeFromNetwork(network, peerToBeRemoved)
+            console.log('-----removeFromNetwork-----')
+            console.log(peerToBeRemoved)
+            console.log(peerSender)
+            console.log(isRemoved)
+            console.log(network.globalPeers)
+            console.log('-----removeFromNetwork-----')
+            if (!!isRemoved) {
+                eventBus.emit('broadcastRemoveFromNetwork', { peerToBeRemoved: peerToBeRemoved, peerSender: peerSender })
+                eventBus.emit('updateNetwork', network)
+            }
+        })
+        eventBus.on('requestNetwork', () => {
+            eventBus.emit('responseNetwork', { ...network })
+        })
+
+        eventBus.on('initNetwork', (initNetwork: Network) => {
+            NetworkInterface.initNetwork(network, initNetwork)
+            eventBus.emit('initNetworkComplete', network)
+            eventBus.emit('updateNetwork', network)
+        })
+
+        eventBus.on('requestNetworkVersionVector', () => {
+            if (network.versionVector === null) throw new Error('Network version vector is null.')
+            eventBus.emit('responseNetworkVersionVector', network.versionVector)
+        })
+
+        eventBus.on('incrementVersionVector', () => {
+            if (network.versionVector === null) throw new Error('Network version vector is null.')
+            network.versionVector = VersionVectorInterface.increment(network.versionVector)
+            eventBus.emit('responseIncrementVersionVector')
+        })
+
+        //---for testing NetworkList
+        eventBus.on('requestPeerConnectionsCount', () => {
+            eventBus.emit('responsePeerConnectionsCount', network.peerConnectionsCount)
+        })
+
+    })
     return network
 }

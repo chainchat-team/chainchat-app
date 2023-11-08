@@ -6,7 +6,7 @@ export function increment(versionVector: VersionVector): VersionVector {
         counter: versionVector.localVersion.counter + 1
     }
     const updatedVersions = versionVector.versions.map(item => {
-        if (item.siteId === versionVector.localVersion.siteId) {
+        if (item.peer.siteId === versionVector.localVersion.peer.siteId) {
             return updatedLocalVersion
         }
         return item

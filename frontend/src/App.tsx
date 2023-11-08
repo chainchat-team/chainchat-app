@@ -3,12 +3,16 @@ import GroupEditor, { loader as groupEditorLoader } from './GroupEditor.tsx'
 import SlateEditor from './components/SlateEditor.tsx';
 import PeerId from './components/PeerId.tsx';
 import { createBroadcast } from './lib/broadcast/create-broadcast.ts';
-import Peer from 'peerjs';
+import { Peer as Peerjs } from 'peerjs';
 import { createCrdt } from './lib/create-crdt.ts';
 import { v1 as UUID } from 'uuid';
 import { createNetwork } from './lib/network/create-network.ts';
-import { BroadcastInterface } from './lib/interfaces/Broadcast.ts';
+import { Broadcast, BroadcastInterface } from './lib/interfaces/Broadcast.ts';
 import NetworkList from './components/NetworkList.tsx';
+import { Crdt } from './lib/interfaces/Crdt.ts';
+import { Network } from './lib/interfaces/Network.ts';
+import { useEffect, useState } from 'react';
+import { eventBus } from './lib/events/create-eventbus.ts';
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -26,15 +30,16 @@ import NetworkList from './components/NetworkList.tsx';
 // ])
 const targetPeerId = location.search.slice(1) || '0'
 // console.log(targetPeerId)
-const peer = new Peer({
+const peerjs = new Peerjs({
   host: 'localhost',
   port: 4000,
   path: '/server',
 })
 const siteId = UUID()
-const network = createNetwork()
-const broadcast = createBroadcast(peer, siteId, targetPeerId)
-const crdt = createCrdt(siteId)
+const network: Network = createNetwork(peerjs, siteId)
+const broadcast: Broadcast = createBroadcast(peerjs, siteId, targetPeerId)
+const crdt: Crdt = createCrdt(peerjs, siteId)
+
 
 window.addEventListener('beforeunload', function (event) {
   BroadcastInterface.close(broadcast)
@@ -42,12 +47,24 @@ window.addEventListener('beforeunload', function (event) {
 
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true)
+  const [peerId, setPeerId] = useState<string | null>(null)
+  useEffect(() => {
+    peerjs.on('open', (id) => {
+      setIsLoading(false)
+      setPeerId(id)
+    })
+  });
   return (
     // <RouterProvider router={router} />
     <>
-      <PeerId />
-      <NetworkList />
-      <SlateEditor crdt={crdt} peerId={peer.id} siteId={siteId} />
+      {isLoading ? (<p>...Loading</p>) :
+        (<>
+          <PeerId peerId={peerId} />
+          <NetworkList />
+          <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
+        </>)
+      }
     </>
   )
 }

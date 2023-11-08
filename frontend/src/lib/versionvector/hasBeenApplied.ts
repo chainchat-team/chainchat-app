@@ -2,7 +2,7 @@ import { Version } from "../interfaces/Version";
 import { VersionVector } from "../interfaces/VersionVector";
 
 export function hasBeenApplied(versionVector: VersionVector, version: Version): boolean {
-    const localCopy = versionVector.versions.find(item => item.siteId === version.siteId);
+    const localCopy = versionVector.versions.find(item => item.peer.siteId === version.peer.siteId);
 
     if (localCopy === undefined) {
         return false

@@ -6,7 +6,13 @@ import { BroadcastCrdtEvent, BroadcastEvent, BroadcastSyncRequestOperation } fro
 import { PeerCrdtEvent, PeerEvent, PeerSyncRequestEvent } from "../../types/PeerEventTypes";
 import { Network } from "../../interfaces/Network";
 import { Peer } from "../../types/Peer";
-import { VersionVector } from "../../interfaces/VersionVector";
+import { VersionVector, VersionVectorInterface } from "../../interfaces/VersionVector";
+import { Version } from "../../interfaces/Version";
+import { version } from "react";
+import { fetchNetwork } from "../../events/fetchNetwork";
+import { fetchCrdt } from "../../events/fetchCrdt";
+import { fetchEditorDescendant } from "../../events/fetchEditorDescendant";
+import initialValue from "../../../slateInitialValue";
 
 
 export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
@@ -14,7 +20,7 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
         connection.on('open', () => {
 
         });
-        connection.on('data', (data: any) => {
+        connection.on('data', async (data: any) => {
             console.log(data)
             switch (data.type) {
                 case 'connRequest':
@@ -25,45 +31,37 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                             connection: connection
                         }
                     )
-                    var network: Partial<Network>;
-                    var versionVector: Partial<VersionVector>;
-                    const responseInitialStructListener = (initalStruct: Descendant[]) => {
-                        const initialData: PeerSyncRequestEvent = {
-                            type: 'syncRequest',
-                            siteId: broadcast.siteId,
-                            peerId: peerjs.id,
-                            initialStruct: initalStruct,
-                            versionVector: versionVector,
-                            network: network
-                        };
-                        connection.send(initialData);
-                        const payload = {
-                            peerToBeAdded: { peerId: data.peerId, siteId: data.siteId },
-                            peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
-                        }
-                        eventBus.emit('addToNetwork', payload)
-                        eventBus.off('response_initial_struct', responseInitialStructListener)
+                    var network = await fetchNetwork()
+                    if (network.versionVector === null) throw new Error('Network version vector is null.')
+                    const networkVersion = VersionVectorInterface.getLocalVersion(network.versionVector)
+                    networkVersion.counter++;
+                    const payload = {
+                        peerToBeAdded: { peerId: data.peerId, siteId: data.siteId },
+                        peerSender: { peerId: peerjs.id, siteId: broadcast.siteId },
+                        networkVersion: networkVersion
                     }
-                    eventBus.on('response_initial_struct', responseInitialStructListener);
-                    const responseVersionVectorListener = (argVersionVector: Partial<VersionVector>) => {
-                        versionVector = argVersionVector
-                        eventBus.emit('request_initial_struct');
-                        eventBus.off('responseVersionVector', responseVersionVectorListener)
-                    }
-                    const responseNetworkListener = (argNetwork: Partial<Network>) => {
-                        network = argNetwork
-                        eventBus.emit('requestVersionVector');
-                        eventBus.off('responseNetwork', responseNetworkListener)
-                    }
-                    eventBus.on('responseVersionVector', responseVersionVectorListener)
-                    eventBus.on('responseNetwork', responseNetworkListener)
-                    eventBus.emit('requestNetwork')
+                    eventBus.emit('addToNetwork', payload)
+
+                    const crdt = await fetchCrdt()
+                    const initalStruct = await fetchEditorDescendant()
+                    network = await fetchNetwork()
+                    if (crdt.versionVector === null) throw new Error('Crdt version vector is null.')
+                    const initialData: PeerSyncRequestEvent = {
+                        type: 'syncRequest',
+                        siteId: broadcast.siteId,
+                        peerId: peerjs.id,
+                        initialStruct: initalStruct,
+                        versionVector: crdt.versionVector,
+                        network: network
+                    };
+                    connection.send(initialData);
                     break
                 case 'addToNetwork':
                     eventBus.emit('addToNetwork',
                         {
                             peerToBeAdded: data.peerToBeAdded,
-                            peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
+                            peerSender: { peerId: peerjs.id, siteId: broadcast.siteId },
+                            networkVersion: data.networkVersion
                         }
                     )
                     break

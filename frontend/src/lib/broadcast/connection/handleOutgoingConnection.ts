@@ -13,7 +13,7 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
             siteId: broadcast.siteId
         })
         connection.on('data', (data: any) => {
-            // console.log(data)
+            console.log(data)
             switch (data.type) {
                 case 'syncRequest':
                     BroadcastInterface.addOutGoingConnection(broadcast,
@@ -30,7 +30,8 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     eventBus.emit('addToNetwork',
                         {
                             peerToBeAdded: data.peerToBeAdded,
-                            peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                            peerSender: { peerId: peer.id, siteId: broadcast.siteId },
+                            networkVersion: data.networkVersion
                         }
                     )
                     break

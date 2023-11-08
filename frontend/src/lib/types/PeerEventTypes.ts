@@ -18,11 +18,13 @@ export type PeerSyncRequestEvent = {
 } & BasePeerEvent
 
 export type PeerAddToNetworkEvent = {
-    peerToBeAdded: Peer
+    peerToBeAdded: Peer,
+    networkVersion: Version
 } & BasePeerEvent
 
 export type PeerRemoveFromNetworkEvent = {
-    peerToBeRemoved: Peer
+    peerToBeRemoved: Peer,
+    networkVersion: Version
 } & BasePeerEvent
 
 

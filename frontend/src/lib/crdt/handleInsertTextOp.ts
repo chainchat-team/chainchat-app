@@ -35,7 +35,7 @@ export function handleInsertTextOp(crtd: Crdt, editor: Editor, operations: Inser
         char = operation.char
     }
     //insert new char in the correct position
-    crtd.insertChar(editor, char, operationPoint)
+    CrdtInterface.insertChar(editor, char, operationPoint)
 
     return [char]
 }

@@ -5,6 +5,8 @@ import { BroadcastOperation } from "../../types/BroadcastOperation"
 import { Peer } from "../types/Peer"
 import { Network } from "../interfaces/Network"
 import { VersionVector } from "../interfaces/VersionVector"
+import { Version } from "../interfaces/Version"
+import { Crdt } from "../interfaces/Crdt"
 type Events = {
     //crdt -> broadcast
     'responseVersionVector': Partial<VersionVector>
@@ -21,15 +23,27 @@ type Events = {
     'handleRemoteOperation': BroadcastCrdtEvent
 
     //broadcast -> network
-    'addToNetwork': { peerToBeAdded: Peer, peerSender: Peer },
+    'addToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version },
     'removeFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer },
     'requestNetwork': void,
     'initNetwork': Network
+    'requestNetworkVersionVector': void,
+    'responseNetworkVersionVector': VersionVector,
 
     //network -> broadcast
-    'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer }
+    'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version }
     'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer }
     'responseNetwork': Network
+    'incrementVersionVector': void
+    'responseIncrementVersionVector': void
+
+    //crdt -> everything else
+    'requestCrdt': void
+    'responseCrdt': Crdt
+
+    //editor -> everything else
+    'requestEditorDescendant': void
+    'responseEditorDescendant': Descendant[]
 
     //contoller -> editor
     'editorInitialValue': Descendant[],
@@ -39,11 +53,15 @@ type Events = {
     'insert': BroadcastCrdtEvent
     'delete': BroadcastCrdtEvent
 
+    //peerjs -> everything
+    'peer': Peer
     // for testing
     'requestCurrentTarget': void
     'responseCurrentTarget': Peer | null
     'initNetworkComplete': Network
-
+    'requestPeerConnectionsCount': void,
+    'responsePeerConnectionsCount': { [key: string]: number }
+    'updateNetwork': Network
 
 
 

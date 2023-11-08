@@ -9,7 +9,7 @@ export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOp
     }
     if (operations[0].type === 'split_node') {
         //update the characters array in the 2 new nodes
-        crtd.splitLine(editor, operations as SplitNodeOperation[])
+        CrdtInterface.splitLine(editor, operations as SplitNodeOperation[])
         const operation = operations[0]
         operationPoint = { path: operation.path, offset: operation.position }
         text = '\n'
@@ -33,7 +33,7 @@ export function handleLocalInsert(crtd: Crdt, editor: Editor, operations: BaseOp
     // also the generation of id maybe wrong because...the 2 default nodes are not consider
     const char: Char = CrdtInterface.generateChar(crtd, leftChar as Char, rightChar, text)
     //insert new char in the correct position
-    crtd.insertChar(editor, char, operationPoint)
+    CrdtInterface.insertChar(editor, char, operationPoint)
 
     return [char]
 }

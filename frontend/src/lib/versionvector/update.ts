@@ -2,12 +2,12 @@ import { Version, VersionInterface } from "../interfaces/Version";
 import { VersionVector } from "../interfaces/VersionVector";
 
 export function update(versionVector: VersionVector, version: Version): VersionVector {
-    var siteVersion = versionVector.versions.find(item => item.siteId === version.siteId);
+    var siteVersion = versionVector.versions.find(item => item.peer.siteId === version.peer.siteId);
     var updatedVersions: Version[];
     if (!siteVersion) {
         siteVersion = VersionInterface.update(
             {
-                siteId: version.siteId,
+                peer: version.peer,
                 counter: 0,
                 exceptions: []
             }, version);
@@ -15,12 +15,17 @@ export function update(versionVector: VersionVector, version: Version): VersionV
         updatedVersions = [...versionVector.versions, siteVersion]
     } else {
         updatedVersions = versionVector.versions.map(item => {
-            if (item.siteId === version.siteId) {
+            if (item.peer.siteId === version.peer.siteId) {
                 return VersionInterface.update(item, version)
             }
             return item
         })
     }
     const updatedVersionVector: VersionVector = { ...versionVector, versions: updatedVersions }
+    console.log('---update---')
+    console.log(versionVector)
+    console.log(version)
+    console.log(updatedVersionVector)
+    console.log('---update---')
     return updatedVersionVector
 }

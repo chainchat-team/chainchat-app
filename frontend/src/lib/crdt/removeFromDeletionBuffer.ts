@@ -6,7 +6,7 @@ export function removeFromDeletionBuffer(crdt: Crdt, operation: BroadcastCrdtEve
         item.type === 'delete' &&
         item.siteId === operation.siteId &&
         item.version.counter === operation.version.counter &&
-        item.version.siteId === operation.version.siteId)
+        item.version.peer.siteId === operation.version.peer.siteId)
     )
     if (localOp === undefined) {
         return null

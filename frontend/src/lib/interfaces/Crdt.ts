@@ -25,6 +25,8 @@ import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
 import { addToDeletionBuffer } from "../crdt/addToDeletionBuffer";
 import { removeFromDeletionBuffer } from "../crdt/removeFromDeletionBuffer";
 import { processDeletionBuffer } from "../crdt/processDeletionBuffer";
+import { insertChar } from "../crdt/insertChar";
+import { splitLine } from "../crdt/splitLine";
 export interface Crdt {
     // Core state
     base: number
@@ -32,11 +34,8 @@ export interface Crdt {
     siteId: string
     strategyCache: boolean[]
     peerId: string | null
-    versionVector: VersionVector
+    versionVector: VersionVector | null
     deletionBuffer: BroadcastCrdtEvent[]
-    //methods
-    insertChar: (editor: Editor, char: Char, point: Point) => void;
-    splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
 }
 
 export interface CrdtInterface {
@@ -49,6 +48,8 @@ export interface CrdtInterface {
     handleRemoteDelete: (crdt: Crdt, editor: Editor, char: Char, version: Version) => void
     findCharToLeft: (crdt: Crdt, editor: Editor, point: Point) => Char | undefined;
     findCharToRight: (crdt: Crdt, editor: Editor, point: Point) => Char;
+    insertChar: (editor: Editor, char: Char, point: Point) => void;
+    splitLine: (editor: Editor, operations: SplitNodeOperation[]) => void
 
     /*--*/
     handleInsertTextOp: (crdt: Crdt, editor: Editor, operation: InsertTextOperation[]) => Char[]
@@ -76,6 +77,8 @@ export const CrdtInterface: CrdtInterface = {
     handleLocalPaste: (...args) => handleLocalPaste(...args),
     handleRemoteInsert: (...args) => handleRemoteInsert(...args),
     handleRemoteDelete: (...args) => handleRemoteDelete(...args),
+    insertChar: (...args) => insertChar(...args),
+    splitLine: (...args) => splitLine(...args),
     handleInsertTextOp: (...args) => handleInsertTextOp(...args),
     handleRemoveTextOp: (...args) => handleRemoveTextOp(...args),
     handleRemoveNodeOp: (...args) => handleRemoveNodeOp(...args),

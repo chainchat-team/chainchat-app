@@ -18,7 +18,7 @@ export function handleSplitNodeOp(crtd: Crdt, editor: Editor, operations: SplitN
         return []
     }
 
-    crtd.splitLine(editor, operations as SplitNodeOperation[])
+    CrdtInterface.splitLine(editor, operations as SplitNodeOperation[])
 
     const operation = operations[0]
     const operationPoint = { path: operation.path, offset: operation.position }
@@ -43,7 +43,7 @@ export function handleSplitNodeOp(crtd: Crdt, editor: Editor, operations: SplitN
         char = operation.char
     }
     //insert new char in the correct position
-    crtd.insertChar(editor, char, operationPoint)
+    CrdtInterface.insertChar(editor, char, operationPoint)
 
     return [char]
 

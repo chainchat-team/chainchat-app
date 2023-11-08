@@ -1,7 +1,8 @@
+import { Peer } from "../types/Peer"
 import { update } from "../version/update"
 
 export interface Version {
-    siteId: string
+    peer: Peer,
     counter: number
     exceptions?: number[]
 }
