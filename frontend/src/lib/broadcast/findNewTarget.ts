@@ -21,12 +21,12 @@ export function findNewTarget(broadcast: Broadcast) {
 
         if (possibleTargets.length === 0) {
             console.log('could not find new target. no possible target.')
-            const changeUrlOnConnectionListener = (connection: DataConnection) => {
-                const newUrl = `${location.host}/?${connection.peer}`
-                window.history.pushState({}, newUrl)
-                broadcast.peer.off('connection', changeUrlOnConnectionListener)
-            }
-            broadcast.peer.on('connection', changeUrlOnConnectionListener)
+            // const changeUrlOnConnectionListener = (connection: DataConnection) => {
+            //     const newUrl = `${location.host}/?${connection.peer}`
+            //     window.history.pushState({}, newUrl)
+            //     broadcast.peer.off('connection', changeUrlOnConnectionListener)
+            // }
+            // broadcast.peer.on('connection', changeUrlOnConnectionListener)
 
         } else {
             const randomIdx = Math.floor(Math.random() * possibleTargets.length);

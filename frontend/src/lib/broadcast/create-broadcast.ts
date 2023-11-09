@@ -17,7 +17,8 @@ export const createBroadcast = (
         incomingConnections: [],
         max_buffer_size: 10,
         siteId: siteId,
-        _isCloser: false
+        _isCloser: false,
+        targetPeerId: targetPeerId
     }
     peerjs.on('open', (id: string) => {
         eventBus.emit('peerId', broadcast.peer.id)
@@ -49,13 +50,14 @@ export const createBroadcast = (
                 }
             })
         })
-        eventBus.on('broadcastRemoveFromNetwork', ({ peerToBeRemoved, peerSender }) => {
+        eventBus.on('broadcastRemoveFromNetwork', ({ peerToBeRemoved, peerSender, networkVersion, connectionType }) => {
             const payload: PeerRemoveFromNetworkEvent = {
                 type: 'removeFromNetwork',
                 siteId: peerSender.siteId,
                 peerId: peerSender.peerId,
-                peerToBeRemoved: { peerId: peerToBeRemoved.peerId, siteId: peerToBeRemoved.siteId }
-                // ADD SENT VERSION, HERE
+                peerToBeRemoved: { peerId: peerToBeRemoved.peerId, siteId: peerToBeRemoved.siteId },
+                networkVersion: networkVersion,
+                connectionType: connectionType
             }
             BroadcastInterface.removeIngoingConnection(broadcast, peerToBeRemoved)
             BroadcastInterface.removeOutgoingConnection(broadcast, peerToBeRemoved)
@@ -86,7 +88,7 @@ export const createBroadcast = (
         // eventBus.emit('requestNetworkVersionVector')
 
         BroadcastInterface.handleIncomingConnection(broadcast, peerjs)
-        if (targetPeerId !== '0') {
+        if (targetPeerId !== '') {
             BroadcastInterface.handleOutgoingConnection(broadcast, peerjs, targetPeerId)
         }
 

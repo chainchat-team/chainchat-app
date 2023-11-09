@@ -22,10 +22,5 @@ export function update(versionVector: VersionVector, version: Version): VersionV
         })
     }
     const updatedVersionVector: VersionVector = { ...versionVector, versions: updatedVersions }
-    console.log('---update---')
-    console.log(versionVector)
-    console.log(version)
-    console.log(updatedVersionVector)
-    console.log('---update---')
     return updatedVersionVector
 }

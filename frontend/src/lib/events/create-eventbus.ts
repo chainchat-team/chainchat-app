@@ -24,7 +24,7 @@ type Events = {
 
     //broadcast -> network
     'addToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version },
-    'removeFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer },
+    'removeFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer, networkVersion: Version, connectionType: 'in' | 'out' },
     'requestNetwork': void,
     'initNetwork': Network
     'requestNetworkVersionVector': void,
@@ -32,7 +32,7 @@ type Events = {
 
     //network -> broadcast
     'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version }
-    'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer }
+    'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer, networkVersion: Version, connectionType: 'in' | 'out' }
     'responseNetwork': Network
     'incrementVersionVector': void
     'responseIncrementVersionVector': void
@@ -55,6 +55,9 @@ type Events = {
 
     //peerjs -> everything
     'peer': Peer
+
+    //for updateing page
+    'updateUrl': string
     // for testing
     'requestCurrentTarget': void
     'responseCurrentTarget': Peer | null

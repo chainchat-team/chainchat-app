@@ -13,6 +13,7 @@ import { Crdt } from './lib/interfaces/Crdt.ts';
 import { Network } from './lib/interfaces/Network.ts';
 import { useEffect, useState } from 'react';
 import { eventBus } from './lib/events/create-eventbus.ts';
+import { createAddress } from './lib/address/create-address.ts';
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -28,22 +29,26 @@ import { eventBus } from './lib/events/create-eventbus.ts';
 //     loader: groupEditorLoader
 //   },
 // ])
-const targetPeerId = location.search.slice(1) || '0'
+const targetPeerId = location.search.slice(1) || ''
 // console.log(targetPeerId)
 const peerjs = new Peerjs({
   host: 'localhost',
   port: 4000,
   path: '/server',
 })
+
+const address = createAddress('http://localhost', '5173', targetPeerId, peerjs)
 const siteId = UUID()
 const network: Network = createNetwork(peerjs, siteId)
 const broadcast: Broadcast = createBroadcast(peerjs, siteId, targetPeerId)
 const crdt: Crdt = createCrdt(peerjs, siteId)
 
 
+
 window.addEventListener('beforeunload', function (event) {
   BroadcastInterface.close(broadcast)
 });
+
 
 
 const App = () => {

@@ -25,6 +25,7 @@ export interface Broadcast {
     max_buffer_size: number
     siteId: string
     _isCloser: boolean
+    targetPeerId: string
 
 }
 

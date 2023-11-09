@@ -20,6 +20,7 @@ export type BroadcastSyncRequestEvent = {
 export type BroadcastCrdtEvent = {
     char: Char
     version: Version
+    connectionType: 'out' | 'in'
 } & BaseBroadcastEvent
 
 

@@ -3,6 +3,9 @@ import { Broadcast, BroadcastInterface } from "../../interfaces/Broadcast";
 import { eventBus } from "../../events/create-eventbus";
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../../types/BroadcastEventTypes";
 import { PeerCrdtEvent, PeerEvent } from "../../types/PeerEventTypes";
+import { Network } from "../../interfaces/Network";
+import { fetchNetwork } from "../../events/fetchNetwork";
+import { VersionVectorInterface } from "../../interfaces/VersionVector";
 // import { Controller, ControllerInterface } from "../../interfaces/Controller";
 export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targetId: string) {
     const connection: DataConnection = peer.connect(targetId)
@@ -39,7 +42,9 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     eventBus.emit('removeFromNetwork',
                         {
                             peerToBeRemoved: data.peerToBeRemoved,
-                            peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                            peerSender: { peerId: peer.id, siteId: broadcast.siteId },
+                            networkVersion: data.networkVersion,
+                            connectionType: data.connectionType
                         }
                     )
                     break
@@ -49,8 +54,27 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     break
             }
         })
-        connection.on('error', () => { })
-        connection.on('close', () => {
+        connection.on('error', async () => {
+            const peerToBeRemoved = BroadcastInterface.getOutgoingPeer(broadcast, connection)
+            const broadcastRemoveFromNetworkListener = (payload: any) => {
+                BroadcastInterface.findNewTarget(broadcast)
+                eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+            }
+            eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+            const network: Network = await fetchNetwork()
+            if (network.versionVector === null) throw new Error('Network version vector is null.')
+            const networkVersion = VersionVectorInterface.getLocalVersion(network.versionVector)
+            networkVersion.counter++;
+            eventBus.emit('removeFromNetwork',
+                {
+                    peerToBeRemoved: peerToBeRemoved,
+                    peerSender: { peerId: peer.id, siteId: broadcast.siteId },
+                    networkVersion: networkVersion,
+                    connectionType: 'out'
+                }
+            );
+        });
+        connection.on('close', async () => {
             if (!broadcast._isCloser) {
                 const peerToBeRemoved = BroadcastInterface.getOutgoingPeer(broadcast, connection)
                 const broadcastRemoveFromNetworkListener = (payload: any) => {
@@ -58,10 +82,16 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
                 }
                 eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+                const network: Network = await fetchNetwork()
+                if (network.versionVector === null) throw new Error('Network version vector is null.')
+                const networkVersion = VersionVectorInterface.getLocalVersion(network.versionVector)
+                networkVersion.counter++;
                 eventBus.emit('removeFromNetwork',
                     {
                         peerToBeRemoved: peerToBeRemoved,
-                        peerSender: { peerId: peer.id, siteId: broadcast.siteId }
+                        peerSender: { peerId: peer.id, siteId: broadcast.siteId },
+                        networkVersion: networkVersion,
+                        connectionType: 'out'
                     }
                 );
             }

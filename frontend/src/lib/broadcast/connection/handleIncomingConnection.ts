@@ -18,7 +18,6 @@ import initialValue from "../../../slateInitialValue";
 export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
     peerjs.on('connection', (connection: DataConnection) => {
         connection.on('open', () => {
-
         });
         connection.on('data', async (data: any) => {
             console.log(data)
@@ -66,13 +65,15 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                     )
                     break
                 case 'removeFromNetwork':
-                    console.log('---data-remoteFromNetwor----')
+                    console.log('---data-remoteFromNetwork----')
                     console.log(data.peerToBeRemoved)
-                    console.log('---data-remoteFromNetwor----')
+                    console.log('---data-remoteFromNetwork----')
                     eventBus.emit('removeFromNetwork',
                         {
                             peerToBeRemoved: data.peerToBeRemoved,
-                            peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
+                            peerSender: { peerId: peerjs.id, siteId: broadcast.siteId },
+                            networkVersion: data.networkVersion,
+                            connectionType: data.connectionType
                         }
                     )
                     break
@@ -84,8 +85,27 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
 
         });
 
-        // connection.on('error', () => { console.log('some error') });
-        connection.on('close', () => {
+        connection.on('error', async (err) => {
+            const peerToBeRemoved = BroadcastInterface.getIncomingPeer(broadcast, connection)
+            const broadcastRemoveFromNetworkListener = (payload: any) => {
+                BroadcastInterface.findNewTarget(broadcast)
+                eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+            }
+            eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+            const network: Network = await fetchNetwork()
+            if (network.versionVector === null) throw new Error('Network version vector is null.')
+            const networkVersion = VersionVectorInterface.getLocalVersion(network.versionVector)
+            networkVersion.counter++;
+            eventBus.emit('removeFromNetwork',
+                {
+                    peerToBeRemoved: peerToBeRemoved,
+                    peerSender: { peerId: peerjs.id, siteId: broadcast.siteId },
+                    networkVersion: networkVersion,
+                    connectionType: 'in'
+                }
+            );
+        });
+        connection.on('close', async () => {
             if (!broadcast._isCloser) {
                 const peerToBeRemoved = BroadcastInterface.getIncomingPeer(broadcast, connection)
                 const broadcastRemoveFromNetworkListener = (payload: any) => {
@@ -93,10 +113,16 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                     eventBus.off('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
                 }
                 eventBus.on('broadcastRemoveFromNetwork', broadcastRemoveFromNetworkListener)
+                const network: Network = await fetchNetwork()
+                if (network.versionVector === null) throw new Error('Network version vector is null.')
+                const networkVersion = VersionVectorInterface.getLocalVersion(network.versionVector)
+                networkVersion.counter++;
                 eventBus.emit('removeFromNetwork',
                     {
                         peerToBeRemoved: peerToBeRemoved,
-                        peerSender: { peerId: peerjs.id, siteId: broadcast.siteId }
+                        peerSender: { peerId: peerjs.id, siteId: broadcast.siteId },
+                        networkVersion: networkVersion,
+                        connectionType: 'in'
                     }
                 );
             }

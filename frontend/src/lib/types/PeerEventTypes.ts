@@ -25,6 +25,7 @@ export type PeerAddToNetworkEvent = {
 export type PeerRemoveFromNetworkEvent = {
     peerToBeRemoved: Peer,
     networkVersion: Version
+    connectionType: 'out' | 'in'
 } & BasePeerEvent
 
 
