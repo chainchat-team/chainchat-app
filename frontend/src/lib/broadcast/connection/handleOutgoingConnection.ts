@@ -44,6 +44,7 @@ export function handleOutgoingConnection(broadcast: Broadcast, peer: Peer, targe
                     )
                     break
                 default:
+                    console.log('--emitting handlRemoteOperation---')
                     eventBus.emit('handleRemoteOperation', data as BroadcastCrdtEvent)
                     break
             }

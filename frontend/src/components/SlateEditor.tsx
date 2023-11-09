@@ -110,6 +110,8 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
 
         const handleRemoteOperation = async (operation: BroadcastCrdtEvent) => {
             console.log('---handleRemoteOperation-start----')
+            console.log(crdt)
+            console.log(operation.version)
             if (VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version)) return
             if (operation.type === 'insert') {
                 await CrdtInterface.handleRemoteInsert(crdt, editor, operation.char, operation.version)

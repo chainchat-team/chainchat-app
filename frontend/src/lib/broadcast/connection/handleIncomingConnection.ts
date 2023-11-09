@@ -77,6 +77,7 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
                     )
                     break
                 default:
+                    console.log('--emitting handlRemoteOperation---')
                     eventBus.emit('handleRemoteOperation', data as BroadcastCrdtEvent)
                     break;
             }

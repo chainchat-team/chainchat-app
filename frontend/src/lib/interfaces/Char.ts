@@ -8,6 +8,7 @@ export interface Char {
     value: string;
     counter: number;
     siteId: string;
+    peerId: string;
 }
 
 export interface CharInterface {

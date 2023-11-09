@@ -52,7 +52,8 @@ export function generateChar(crtd: Crdt, char1: Char, char2: Char, value: string
         identifiers: identifiers,
         value: value,
         counter: crtd.versionVector.localVersion.counter,
-        siteId: crtd.siteId
+        siteId: crtd.siteId,
+        peerId: crtd.peerId
     }
     return newChar
 }
