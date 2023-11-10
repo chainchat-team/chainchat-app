@@ -18,7 +18,7 @@ export const createBroadcast = (
         max_buffer_size: 10,
         siteId: siteId,
         _isCloser: false,
-        targetPeerId: targetPeerId
+        targetPeerId: targetPeerId,
     }
     peerjs.on('open', (id: string) => {
         eventBus.emit('peerId', broadcast.peer.id)

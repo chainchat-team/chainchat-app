@@ -14,5 +14,8 @@ export function removeFromNetwork(network: Network, partialPeer: Partial<Peer>):
         ...network.globalPeers.slice(0, index),
         ...network.globalPeers.slice(index + 1)
     ]
+    //also update the count
+    network.peerConnectionsCount = { ...network.peerConnectionsCount }
+    delete network.peerConnectionsCount[peer.peerId]
     return peer
 }

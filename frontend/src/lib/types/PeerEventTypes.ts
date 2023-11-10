@@ -17,6 +17,12 @@ export type PeerSyncRequestEvent = {
     network: Partial<Network>,
 } & BasePeerEvent
 
+export type PeerForwardRequestEvent = {
+    avialablePeer: Peer
+} & BasePeerEvent
+
+export type PeerNetworkFullEvent = {} & BasePeerEvent
+
 export type PeerAddToNetworkEvent = {
     peerToBeAdded: Peer,
     networkVersion: Version

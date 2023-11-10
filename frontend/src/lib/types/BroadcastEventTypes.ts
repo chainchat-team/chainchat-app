@@ -3,6 +3,7 @@ import { Char } from "../interfaces/Char"
 import { Network } from "../interfaces/Network"
 import { Version } from "../interfaces/Version"
 import { VersionVector } from "../interfaces/VersionVector"
+import { Peer } from "./Peer"
 
 export type BaseBroadcastEvent = {
     type: string,
@@ -14,6 +15,10 @@ export type BroadcastSyncRequestEvent = {
     initialStruct: Descendant[],
     versionVector: Partial<VersionVector>,
     network: Partial<Network>
+} & BaseBroadcastEvent
+
+export type BroadcastForwardRequestEvent = {
+    avialablePeer: Peer
 } & BaseBroadcastEvent
 
 

@@ -21,12 +21,11 @@ export interface NetworkInterface {
     removeFromNetwork: (network: Network, peer: Partial<Peer>) => Peer | null
     initNetwork: (network: Network, otherNetwork: Network) => void
     incrementVersionVector: (network: Network) => void
-
 }
 
 export const NetworkInterface: NetworkInterface = {
     addToNetwork: (...args) => addToNetwork(...args),
     removeFromNetwork: (...args) => removeFromNetwork(...args),
     initNetwork: (...args) => initNetwork(...args),
-    incrementVersionVector: (...args) => incrementVersionVector(...args)
+    incrementVersionVector: (...args) => incrementVersionVector(...args),
 }

@@ -3,12 +3,13 @@ import { Network, NetworkInterface } from "../interfaces/Network"
 import { VersionVectorInterface } from "../interfaces/VersionVector"
 import { Peer } from "../types/Peer"
 import { Peer as PeerJs } from 'peerjs'
+import { networkSize } from "./networkSize"
 
 export const createNetwork = (peerjs: PeerJs, siteId: string): Network => {
     const network: Network = {
         globalPeers: [],
         versionVector: null,
-        peerConnectionsCount: {}
+        peerConnectionsCount: {},
     }
     peerjs.on('open', (id: string) => {
         const peer: Peer = { siteId: siteId, peerId: id }

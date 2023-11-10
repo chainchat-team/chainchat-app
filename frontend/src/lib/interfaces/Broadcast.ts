@@ -16,6 +16,9 @@ import { getOutgoingPeer } from "../broadcast/getOutgoingPeer"
 import { closeDeadPeers } from "../broadcast/closeDeadPeer"
 import { close } from "../broadcast/close"
 import { findNewTarget } from "../broadcast/findNewTarget"
+import { hasReachedMax } from "../broadcast/hasReachedMax"
+import { getAvailablePeer } from "../broadcast/getAvailablePeer"
+import { getConnectionThreshold } from "../broadcast/getConnectionThreshold"
 
 export interface Broadcast {
     peer: PeerJs,
@@ -26,7 +29,6 @@ export interface Broadcast {
     siteId: string
     _isCloser: boolean
     targetPeerId: string
-
 }
 
 export interface BroadcastInterface {
@@ -46,6 +48,11 @@ export interface BroadcastInterface {
     closeDeadPeers: (broadcast: Broadcast) => void
     close: (broadcast: Broadcast) => void
 
+    //forward request
+    hasReachedMax: (broadcast: Broadcast) => Promise<boolean>
+    getAvailablePeer: (broadcast: Broadcast) => Promise<Peer | undefined>
+    getConnectionThreshold: (broadcast: Broadcast) => Promise<number>
+
 }
 
 export const BroadcastInterface: BroadcastInterface = {
@@ -61,5 +68,8 @@ export const BroadcastInterface: BroadcastInterface = {
     findNewTarget: (...args) => findNewTarget(...args),
     sendOperation: (...args) => sendOperation(...args),
     closeDeadPeers: (...args) => closeDeadPeers(...args),
-    close: (...args) => close(...args)
+    close: (...args) => close(...args),
+    hasReachedMax: (...args) => hasReachedMax(...args),
+    getAvailablePeer: (...args) => getAvailablePeer(...args),
+    getConnectionThreshold: (...args) => getConnectionThreshold(...args)
 }
