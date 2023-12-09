@@ -1,0 +1,7 @@
+{
+    "tabWidth": 2,
+    "useTabs": false,
+    "editor.printWidth": 120,
+    "printWidth": 120,
+    "editor.formatOnSave": true
+}

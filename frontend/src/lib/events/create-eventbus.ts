@@ -1,72 +1,91 @@
-import mitt, { Emitter } from "mitt"
-import { Descendant } from "../../types/Descendant"
-import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../types/BroadcastEventTypes"
-import { BroadcastOperation } from "../../types/BroadcastOperation"
-import { Peer } from "../types/Peer"
-import { Network } from "../interfaces/Network"
-import { VersionVector } from "../interfaces/VersionVector"
-import { Version } from "../interfaces/Version"
-import { Crdt } from "../interfaces/Crdt"
+import mitt, { Emitter } from "mitt";
+import { Descendant } from "../../types/Descendant";
+import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../types/BroadcastEventTypes";
+import { BroadcastOperation } from "../../types/BroadcastOperation";
+import { Peer } from "../types/Peer";
+import { Network } from "../interfaces/Network";
+import { VersionVector } from "../interfaces/VersionVector";
+import { Version } from "../interfaces/Version";
+import { Crdt } from "../interfaces/Crdt";
+import { HuddleManager } from "../interfaces/HuddleManager";
 type Events = {
-    //crdt -> broadcast
-    'responseVersionVector': Partial<VersionVector>
-    //broadcast -> controller
-    'updateControllerUrlid': string,
-    'request_initial_struct': void,
-    'response_initial_struct': Descendant[],
-    'handleSyncRequest': BroadcastSyncRequestEvent,
-    //broadcast -> crdt
-    'requestVersionVector': void
+  //crdt -> broadcast
+  responseVersionVector: Partial<VersionVector>;
+  //broadcast -> controller
+  updateControllerUrlid: string;
+  request_initial_struct: void;
+  response_initial_struct: Descendant[];
+  handleSyncRequest: BroadcastSyncRequestEvent;
+  //broadcast -> crdt
+  requestVersionVector: void;
+  //boradcast -> huddleManager
+  initMediaStream: MediaStream;
+  closeLocalMediaStream: void;
 
-    //broadcast -> components
-    'peerId': string,
-    'handleRemoteOperation': BroadcastCrdtEvent
+  //broadcast -> components
+  peerId: string;
+  handleRemoteOperation: BroadcastCrdtEvent;
 
-    //broadcast -> network
-    'addToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version },
-    'removeFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer, networkVersion: Version, connectionType: 'in' | 'out' },
-    'requestNetwork': void,
-    'initNetwork': Network
-    'requestNetworkVersionVector': void,
-    'responseNetworkVersionVector': VersionVector,
+  //broadcast -> network
+  addToNetwork: { peerToBeAdded: Peer; peerSender: Peer; networkVersion: Version };
+  removeFromNetwork: { peerToBeRemoved: Peer; peerSender: Peer; networkVersion: Version; connectionType: "in" | "out" };
+  requestNetwork: void;
+  initNetwork: Network;
+  requestNetworkVersionVector: void;
+  responseNetworkVersionVector: VersionVector;
 
-    //network -> broadcast
-    'broadcastAddToNetwork': { peerToBeAdded: Peer, peerSender: Peer, networkVersion: Version }
-    'broadcastRemoveFromNetwork': { peerToBeRemoved: Peer, peerSender: Peer, networkVersion: Version, connectionType: 'in' | 'out' }
-    'responseNetwork': Network
-    'incrementVersionVector': void
-    'responseIncrementVersionVector': void
+  //network -> broadcast
+  broadcastAddToNetwork: { peerToBeAdded: Peer; peerSender: Peer; networkVersion: Version };
+  broadcastRemoveFromNetwork: {
+    peerToBeRemoved: Peer;
+    peerSender: Peer;
+    networkVersion: Version;
+    connectionType: "in" | "out";
+  };
+  responseNetwork: Network;
+  incrementVersionVector: void;
+  responseIncrementVersionVector: void;
 
-    //crdt -> everything else
-    'requestCrdt': void
-    'responseCrdt': Crdt
+  //huddleManager -> everything eles
+  requestHuddleManager: void;
+  responseHuddleManager: HuddleManager;
+  addToActiveCalls: Peer;
+  removeFromActiveCalls: Peer;
+  updateHuddleManager: HuddleManager;
 
-    //editor -> everything else
-    'requestEditorDescendant': void
-    'responseEditorDescendant': Descendant[]
+  //crdt -> everything else
+  requestCrdt: void;
+  responseCrdt: Crdt;
 
-    //contoller -> editor
-    'editorInitialValue': Descendant[],
-    'enableEditor': boolean,
+  //editor -> everything else
+  requestEditorDescendant: void;
+  responseEditorDescendant: Descendant[];
 
-    //editor -> broadcast
-    'insert': BroadcastCrdtEvent
-    'delete': BroadcastCrdtEvent
+  //contoller -> editor
+  editorInitialValue: Descendant[];
+  enableEditor: boolean;
 
-    //peerjs -> everything
-    'peer': Peer
+  //editor -> broadcast
+  insert: BroadcastCrdtEvent;
+  delete: BroadcastCrdtEvent;
 
-    //for updateing page
-    'updateUrl': string
-    // for testing
-    'requestCurrentTarget': void
-    'responseCurrentTarget': Peer | null
-    'initNetworkComplete': Network
-    'requestPeerConnectionsCount': void,
-    'responsePeerConnectionsCount': { [key: string]: number }
-    'updateNetwork': Network
+  //call component -> broadcast
+  call: string;
 
+  //hangup component -> broadcast
+  hangup: string;
 
+  //peerjs -> everything
+  peer: Peer;
 
-}
-export const eventBus: Emitter<Events> = mitt<Events>()
+  //for updateing page
+  updateUrl: string;
+  // for testing
+  requestCurrentTarget: void;
+  responseCurrentTarget: Peer | null;
+  initNetworkComplete: Network;
+  requestPeerConnectionsCount: void;
+  responsePeerConnectionsCount: { [key: string]: number };
+  updateNetwork: Network;
+};
+export const eventBus: Emitter<Events> = mitt<Events>();
