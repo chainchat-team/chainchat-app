@@ -8,6 +8,7 @@ import { VersionVector } from "../interfaces/VersionVector";
 import { Version } from "../interfaces/Version";
 import { Crdt } from "../interfaces/Crdt";
 import { HuddleManager } from "../interfaces/HuddleManager";
+import { Address } from "../interfaces/Address";
 type Events = {
   //crdt -> broadcast
   responseVersionVector: Partial<VersionVector>;
@@ -87,5 +88,10 @@ type Events = {
   requestPeerConnectionsCount: void;
   responsePeerConnectionsCount: { [key: string]: number };
   updateNetwork: Network;
+
+  // get sharing link
+  requestAddress: void;
+  responseAddress: Address;
+  updateAddress: Address;
 };
 export const eventBus: Emitter<Events> = mitt<Events>();

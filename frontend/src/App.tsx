@@ -17,6 +17,7 @@ import { createAddress } from "./lib/address/create-address.ts";
 import Huddle from "./components/Huddle.tsx";
 import { createHuddleManager } from "./lib/huddle/create-huddleManager.ts";
 import { HuddleManager } from "./lib/interfaces/HuddleManager.ts";
+import SharingLink from "./components/SharingLink.tsx";
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -70,6 +71,7 @@ const App = () => {
       ) : (
         <>
           <PeerId peerId={peerId} />
+          <SharingLink />
           <NetworkList />
           <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
           <Huddle peerId={peerId} />
