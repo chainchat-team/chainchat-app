@@ -1,0 +1,7 @@
+{
+    "port": 9000,
+    "path": "/server",
+    "key": "chatapp",
+    "proxied": false,
+    "debug": 3
+}
