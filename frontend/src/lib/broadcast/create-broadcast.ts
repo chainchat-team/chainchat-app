@@ -35,13 +35,13 @@ export const createBroadcast = (peerjs: Peerjs, siteId: string, targetPeerId: st
       broadcast.incomingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
     });
     eventBus.on("broadcastAddToNetwork", async ({ peerToBeAdded, peerSender, networkVersion }) => {
-      const avatar: Avatar = await fetchAvatar(peerToBeAdded.peerId);
+      // const avatar: Avatar = await fetchAvatar(peerToBeAdded.peerId);
       // only tell you peers this has been added
       const payload: PeerAddToNetworkEvent = {
         type: "addToNetwork",
         siteId: peerSender.siteId, // this should be the id of the whoever send the request
         peerId: peerSender.peerId,
-        peerToBeAdded: { peerId: peerToBeAdded.peerId, siteId: peerToBeAdded.siteId, avatar: avatar },
+        peerToBeAdded: { peerId: peerToBeAdded.peerId, siteId: peerToBeAdded.siteId, avatar: undefined },
         networkVersion: networkVersion,
       };
       broadcast.outgoingConnections.forEach((peer) => {

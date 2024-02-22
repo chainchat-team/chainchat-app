@@ -88,7 +88,7 @@ const App = () => {
               <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
               <StatusBar />
             </div>
-            <NetworkList />
+            <NetworkList peerId={peerjs.id} />
           </div>
           <Huddle peerId={peerId} />
         </>

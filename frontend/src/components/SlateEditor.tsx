@@ -97,9 +97,6 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     };
     eventBus.on("request_initial_struct", responseInitialStruct);
     eventBus.on("requestEditorDescendant", () => {
-      console.log("--requestEditorDescendant----");
-      console.log(editor.children);
-      console.log("--requestEditorDescendant----");
       eventBus.emit("responseEditorDescendant", editor.children);
     });
 
@@ -132,8 +129,6 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
       editor={editor}
       initialValue={initalValue}
       onChange={(decendant) => {
-        console.log("----run--");
-        console.log(editor.children);
         const totalLines = editor.children.length;
         const totalWords = editor.children.reduce((acc, child) => {
           return acc + child.children.map((c) => c.text.split(" ").filter((c) => c != "").length)[0];

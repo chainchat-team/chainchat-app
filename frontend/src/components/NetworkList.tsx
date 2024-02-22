@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC } from "react";
 import { Network } from "../lib/interfaces/Network";
 import { Peer } from "../lib/types/Peer";
 import { eventBus } from "../lib/events/create-eventbus";
@@ -12,12 +12,14 @@ import { Avatar } from "../lib/types/Avatar";
 import { fetchAvatar } from "../lib/events/fetchAvatar";
 import "../css/style.css";
 
-const NetworkList = () => {
+type NetworkListProps = {
+  peerId: string | null;
+};
+
+const NetworkList: FC<NetworkListProps> = ({ peerId }) => {
   // Use state to manage the network data
   const [network, setNetwork] = useState<Network | null>(null);
   const [huddleManager, setHuddleManager] = useState<HuddleManager | null>(null);
-  const [targetPeer, setTargetPeer] = useState<Peer | null>();
-  const [peerID, setPeerId] = useState<string>("");
   const comparePeers = (peerA: Peer, peerB: Peer) => {
     if (peerA.peerId < peerB.peerId) {
       return -1;
@@ -28,11 +30,6 @@ const NetworkList = () => {
     return 0;
   };
   useEffect(() => {
-    const peerIdListener = (id: string) => {
-      setPeerId(id);
-    };
-    eventBus.on("peerId", peerIdListener);
-
     // subscribe to the event bus to receive the network data
     const asyncFetchNetwork = async () => {
       const network = await fetchNetwork();
@@ -74,13 +71,16 @@ const NetworkList = () => {
         <>
           <div className="peer">
             Peers:
+            <span>-{peerId}</span>
             <ul>
               {network.globalPeers.sort(comparePeers).map((peer, index) => (
                 <li key={index}>
                   <span style={{ backgroundColor: peer.avatar?.color }}>
                     {peer.avatar ? peer.avatar.animal : peer.peerId}
                   </span>
-                  {!isInActiveCall(peer) ? (
+                  {peer.peerId === peerId ? (
+                    " (You)"
+                  ) : !isInActiveCall(peer) ? (
                     <CallButton key={peer.peerId} peerId={peer.peerId} />
                   ) : (
                     <HangupButton key={peer.peerId} peerId={peer.peerId} />
