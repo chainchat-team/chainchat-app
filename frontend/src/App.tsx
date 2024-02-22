@@ -19,6 +19,8 @@ import { createHuddleManager } from "./lib/huddle/create-huddleManager.ts";
 import { HuddleManager } from "./lib/interfaces/HuddleManager.ts";
 import SharingLink from "./components/SharingLink.tsx";
 import "../src/css/style.css";
+import Navbar from "./components/Navbar.tsx";
+import StatusBar from "./components/StatusBar.tsx";
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -71,6 +73,7 @@ const App = () => {
         <p>...Loading</p>
       ) : (
         <>
+          <Navbar />
           <div className="text-wrapper">
             <div className="editor">
               <div className="header">
@@ -83,6 +86,7 @@ const App = () => {
                 </button>
               </div>
               <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
+              <StatusBar />
             </div>
             <NetworkList />
           </div>

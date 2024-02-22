@@ -10,6 +10,7 @@ import { Crdt } from "../interfaces/Crdt";
 import { HuddleManager } from "../interfaces/HuddleManager";
 import { Address } from "../interfaces/Address";
 import { Avatar } from "../types/Avatar";
+import { BasePoint, Point } from "slate";
 type Events = {
   //crdt -> broadcast
   responseVersionVector: Partial<VersionVector>;
@@ -98,5 +99,8 @@ type Events = {
   //get avatar
   requestAvatar: string;
   responseAvatar: Avatar;
+
+  //editor statistics
+  updateEditorStatistics: { totalLines: number; totalWords: number; cursorPoint: BasePoint | undefined };
 };
 export const eventBus: Emitter<Events> = mitt<Events>();

@@ -408,3 +408,43 @@ ToolTip
 .copy-status.copied {
   animation: blinker 1s cubic-bezier(0.5, 0, 1, 1);
 }
+
+/****************
+NavBar
+****************/
+
+.navbar {
+  display: flex;
+  justify-content: left;
+  min-width: 710px;
+}
+
+.nav-items {
+  flex-grow: 0.75;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.logo {
+  transition: all 0.3s ease-in-out 0s;
+}
+
+.logo:hover {
+  color: rgb(17, 117, 232);
+}
+
+/****************
+Status Bar
+***************/
+.editor-statusbar {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #959694;
+  text-align: right;
+}
+
+.editor-statusbar span {
+  margin-right: 10px;
+  min-width: 4em;
+  margin-left: 1em;
+}

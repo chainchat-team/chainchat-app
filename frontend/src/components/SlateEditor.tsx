@@ -70,11 +70,6 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
   return editor;
 };
 
-const withEventBusPlugIn = (editor: BaseEditor) => {
-  console.log("---withEventsBusPlugIn---");
-  return editor;
-};
-
 const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
   // is it possible
   // const [editor] = useState(withReact(withEventBusPlugIn(withCustomRemoveOperation(createEditor(), crdt))))
@@ -139,10 +134,13 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
       onChange={(decendant) => {
         console.log("----run--");
         console.log(editor.children);
-        console.log(editor.operations);
-        // console.log(editor.selection)
-        console.log(crdt.deletionBuffer);
-        console.log("----run--");
+        const totalLines = editor.children.length;
+        const totalWords = editor.children.reduce((acc, child) => {
+          return acc + child.children.map((c) => c.text.split(" ").filter((c) => c != "").length)[0];
+        }, 0);
+        const cursorPoint = editor.selection?.anchor;
+
+        eventBus.emit("updateEditorStatistics", { totalLines, totalWords, cursorPoint });
       }}
     >
       <Editable
