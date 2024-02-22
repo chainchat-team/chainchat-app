@@ -32,7 +32,8 @@ export function handleIncomingMediaConnection(broadcast: Broadcast) {
       }
       eventBus.emit("addToActiveCalls", { ...targetPeer, mediaConnection: connection, mediaStream: remoteMediaStream });
 
-      eventBus.on("hangup", () => {
+      eventBus.on("hangup", (peerId) => {
+        if (peerId !== connection.peer) return;
         connection.close();
         eventBus.emit("removeFromActiveCalls", {
           ...targetPeer,

@@ -14,6 +14,7 @@ interface VideoModalProps {
 }
 
 const VideoModal: FC<VideoModalProps> = ({ peer, mediaStream, onClose }) => {
+  const nodeRef = React.useRef(null);
   const [isMinimized, setIsMinimized] = React.useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -31,8 +32,8 @@ const VideoModal: FC<VideoModalProps> = ({ peer, mediaStream, onClose }) => {
   };
 
   return (
-    <Draggable1>
-      <div className={`video-modal ${isMinimized ? "mini" : ""}`}>
+    <Draggable1 nodeRef={nodeRef}>
+      <div className={`video-modal ${isMinimized ? "mini" : ""}`} ref={nodeRef}>
         <div className="video-bar" style={{ backgroundColor: peer.avatar!.color }}>
           <Minus className="minimize" onClick={handleMinimizeClick} />
           {peer.avatar?.animal}

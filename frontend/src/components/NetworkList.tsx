@@ -71,7 +71,6 @@ const NetworkList: FC<NetworkListProps> = ({ peerId }) => {
         <>
           <div className="peer">
             Peers:
-            <span>-{peerId}</span>
             <ul>
               {network.globalPeers.sort(comparePeers).map((peer, index) => (
                 <li key={index}>

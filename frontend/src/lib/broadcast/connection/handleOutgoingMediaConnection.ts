@@ -38,7 +38,8 @@ export async function handleOutgoingMediaConnection(broadcast: Broadcast, target
   const connection: MediaConnection = broadcast.peer.call(targetPeer.peerId, mediaStream);
   connection.on("stream", (remoteMediaStream: MediaStream) => {
     eventBus.emit("addToActiveCalls", { ...targetPeer, mediaConnection: connection, mediaStream: remoteMediaStream });
-    eventBus.on("hangup", () => {
+    eventBus.on("hangup", (peerId) => {
+      if (peerId !== targetPeerId) return;
       connection.close();
       eventBus.emit("removeFromActiveCalls", {
         ...targetPeer,
