@@ -9,6 +9,7 @@ import { Version } from "../interfaces/Version";
 import { Crdt } from "../interfaces/Crdt";
 import { HuddleManager } from "../interfaces/HuddleManager";
 import { Address } from "../interfaces/Address";
+import { Avatar } from "../types/Avatar";
 type Events = {
   //crdt -> broadcast
   responseVersionVector: Partial<VersionVector>;
@@ -93,5 +94,9 @@ type Events = {
   requestAddress: void;
   responseAddress: Address;
   updateAddress: Address;
+
+  //get avatar
+  requestAvatar: string;
+  responseAvatar: Avatar;
 };
 export const eventBus: Emitter<Events> = mitt<Events>();

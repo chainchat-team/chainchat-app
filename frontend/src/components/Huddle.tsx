@@ -35,17 +35,15 @@ const Huddle: FC<HuddleProps> = ({ peerId }) => {
           {huddleManager.activeCalls
             .filter((peer) => peer.peerId !== peerId)
             .map((peer) => (
-              <>
+              <React.Fragment key={peer.peerId}>
                 <VideoModal
-                  key={peer.peerId}
-                  id={peer.peerId}
+                  peer={peer}
                   mediaStream={peer.mediaStream} // Use specific media stream for each call
                   onClose={() => {
                     throw Error("onClose not implemented");
                   }}
                 />
-                <p key={`modalText_${peer.peerId}`}> Vido Modal: {peer.peerId}</p>
-              </>
+              </React.Fragment>
             ))}
         </>
       ) : (

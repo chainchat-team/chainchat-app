@@ -1,24 +1,46 @@
 import React, { useEffect, useRef, FC } from "react";
-import "../style/VideoModal.css";
+import "../css/style.css";
+import { X, Minus } from "react-feather";
+import Draggable from "react-draggable";
+import { eventBus } from "../lib/events/create-eventbus";
+import { Avatar } from "../lib/types/Avatar";
+import { Peer } from "../lib/types/Peer";
+
+const Draggable1: any = Draggable;
 interface VideoModalProps {
-  id: string;
+  peer: Peer;
   mediaStream: MediaStream | undefined;
   onClose: () => void;
 }
 
-const VideoModal: FC<VideoModalProps> = ({ id, mediaStream, onClose }) => {
+const VideoModal: FC<VideoModalProps> = ({ peer, mediaStream, onClose }) => {
+  const [isMinimized, setIsMinimized] = React.useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
-    console.log("useeffect");
     if (videoRef.current && mediaStream) {
       videoRef.current.srcObject = mediaStream;
     }
   }, []);
 
+  const handleMinimizeClick = () => {
+    setIsMinimized(!isMinimized);
+  };
+
+  const hangUpHandler = () => {
+    eventBus.emit("hangup", peer.peerId);
+  };
+
   return (
-    <div className="modal">
-      <div className="modal-content">{mediaStream && <video key={id} ref={videoRef} autoPlay />}</div>
-    </div>
+    <Draggable1>
+      <div className={`video-modal ${isMinimized ? "mini" : ""}`}>
+        <div className="video-bar" style={{ backgroundColor: peer.avatar!.color }}>
+          <Minus className="minimize" onClick={handleMinimizeClick} />
+          {peer.avatar?.animal}
+          <X className="exit" onClick={hangUpHandler} />
+        </div>
+        {mediaStream && <video key={peer.peerId} ref={videoRef} className={isMinimized ? "hide" : ""} autoPlay />}
+      </div>
+    </Draggable1>
   );
 };
 

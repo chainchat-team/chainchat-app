@@ -1,4 +1,5 @@
 import { DataConnection, MediaConnection } from "peerjs";
+import { Avatar } from "./Avatar";
 
 export type Peer = {
   peerId: string;
@@ -6,4 +7,5 @@ export type Peer = {
   connection?: DataConnection;
   mediaConnection?: MediaConnection;
   mediaStream?: MediaStream;
+  avatar?: Avatar;
 };

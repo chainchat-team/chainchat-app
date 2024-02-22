@@ -18,6 +18,7 @@ import Huddle from "./components/Huddle.tsx";
 import { createHuddleManager } from "./lib/huddle/create-huddleManager.ts";
 import { HuddleManager } from "./lib/interfaces/HuddleManager.ts";
 import SharingLink from "./components/SharingLink.tsx";
+import "../src/css/style.css";
 // export async function loader() {
 //   return redirect(`group/${Date.now()}`)
 // }
@@ -70,10 +71,21 @@ const App = () => {
         <p>...Loading</p>
       ) : (
         <>
-          <PeerId peerId={peerId} />
-          <SharingLink />
-          <NetworkList />
-          <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
+          <div className="text-wrapper">
+            <div className="editor">
+              <div className="header">
+                <SharingLink />
+                <button id="download" className="button">
+                  Save
+                </button>
+                <button id="upload" className="button">
+                  Upload
+                </button>
+              </div>
+              <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
+            </div>
+            <NetworkList />
+          </div>
           <Huddle peerId={peerId} />
         </>
       )}

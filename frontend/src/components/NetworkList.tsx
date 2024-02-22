@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Network } from "../lib/interfaces/Network";
 import { Peer } from "../lib/types/Peer";
 import { eventBus } from "../lib/events/create-eventbus";
-import "../style/NetworkList.css";
+// import "../style/NetworkList.css";
 import CallButton from "./CallButton";
 import { fetchHuddleManager } from "../lib/events/fetchHuddleManager";
 import { HuddleManager } from "../lib/interfaces/HuddleManager";
 import HangupButton from "./HangupButton";
+import { fetchNetwork } from "../lib/events/fetchNetwork";
+import { Avatar } from "../lib/types/Avatar";
+import { fetchAvatar } from "../lib/events/fetchAvatar";
+import "../css/style.css";
 
 const NetworkList = () => {
   // Use state to manage the network data
@@ -30,15 +34,11 @@ const NetworkList = () => {
     eventBus.on("peerId", peerIdListener);
 
     // subscribe to the event bus to receive the network data
-    const fetchNetwork = () => {
-      const responseNetworkListener = (network: Network) => {
-        setNetwork(network);
-        eventBus.off("responseNetwork", responseNetworkListener);
-      };
-      eventBus.on("responseNetwork", responseNetworkListener);
-      eventBus.emit("requestNetwork");
+    const asyncFetchNetwork = async () => {
+      const network = await fetchNetwork();
+      setNetwork(network);
     };
-    fetchNetwork();
+    asyncFetchNetwork();
 
     const updateNetworkListener = (network: Network) => {
       setNetwork({ ...network });
@@ -69,41 +69,29 @@ const NetworkList = () => {
     return false;
   };
   return (
-    <div>
+    <div id="peerId">
       {network !== null ? (
         <>
-          <p>Network List</p>
-          <table className="network-table">
-            <thead>
-              <tr>
-                <th>Peer ID</th>
-                <th>Status</th>
-                <th>Connected To</th>
-                <th>Connection Count</th>
-                <th>Call</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="peer">
+            Peers:
+            <ul>
               {network.globalPeers.sort(comparePeers).map((peer, index) => (
-                <tr key={index}>
-                  <td>{peer.peerId}</td>
-                  <td>{peer.peerId === peerID ? "You" : ""}</td>
-                  <td>{peer.peerId === targetPeer?.peerId ? "Connected To" : ""}</td>
-                  <td>{network.peerConnectionsCount[peer.peerId] || 0}</td>
-                  <td>
-                    {!isInActiveCall(peer) ? (
-                      <CallButton key={peer.peerId} peerId={peer.peerId} />
-                    ) : (
-                      <HangupButton key={peer.peerId} peerId={peer.peerId} />
-                    )}
-                  </td>
-                </tr>
+                <li key={index}>
+                  <span style={{ backgroundColor: peer.avatar?.color }}>
+                    {peer.avatar ? peer.avatar.animal : peer.peerId}
+                  </span>
+                  {!isInActiveCall(peer) ? (
+                    <CallButton key={peer.peerId} peerId={peer.peerId} />
+                  ) : (
+                    <HangupButton key={peer.peerId} peerId={peer.peerId} />
+                  )}
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          </div>
         </>
       ) : (
-        <span>Loading Network List</span>
+        <p>No network available</p>
       )}
     </div>
   );

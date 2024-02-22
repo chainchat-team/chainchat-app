@@ -2,39 +2,53 @@ import React, { useEffect, useState } from "react";
 import { fetchAddress } from "../lib/events/fetchAddress";
 import { Address } from "../lib/interfaces/Address";
 import { eventBus } from "../lib/events/create-eventbus";
+import { Copy } from "react-feather";
+import "../css/style.css";
 
 const SharingLink = () => {
-  const [address, setAddress] = useState<Address | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [link, setLink] = useState("");
 
   useEffect(() => {
-    const asyncFetchAddress = async () => {
+    const asyncSetLink = async () => {
       const address = await fetchAddress();
-      setAddress(address);
+      setLink(`${address.host}:${address.port}/?${address.peerId}`);
     };
-    asyncFetchAddress();
+    asyncSetLink();
 
-    const updateAddressListener = (address: Address) => {
-      setAddress({ ...address });
+    const updateLinkListener = (address: Address) => {
+      setLink(`${address.host}:${address.port}/?${address.peerId}`);
     };
-    eventBus.on("updateAddress", updateAddressListener);
+    eventBus.on("updateAddress", updateLinkListener);
 
     return () => {
-      eventBus.off("updateAddress", updateAddressListener);
+      eventBus.off("updateAddress", updateLinkListener);
     };
   }, []);
 
   const copyToClipboard = () => {
-    if (address) {
-      navigator.clipboard.writeText(`${address.host}:${address.port}/?${address.peerId}`);
+    if (link.length > 0) {
+      navigator.clipboard.writeText(link);
     }
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
   };
 
   return (
-    <div>
-      <p>Sharing Link</p>
-      <input type="text" value={address ? `${address.host}:${address.port}/?${address.peerId}` : ""} readOnly />
-      <button onClick={copyToClipboard}>Copy to Clipboard</button>
-    </div>
+    <p className="sharing-link">
+      {/* Sharing link */}
+      <a href={link} id="myLink" target="_blank" rel="noopener noreferrer" className="link">
+        Sharing Link
+      </a>
+      {/* Place holder span */}
+      <span id="myLinkInput" className="aside disappear"></span>
+      <span className="copy-container" data-tooltip="Copy to Clipboard" onClick={copyToClipboard}>
+        <Copy className="copy-link" color="rgb(17, 117, 232)" />
+      </span>
+      <span className={`copy-status ${copied ? "copied" : ""}`}>Copied!</span>
+    </p>
   );
 };
 

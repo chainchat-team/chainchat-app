@@ -10,6 +10,8 @@ import {
 import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
 import { VersionVector, VersionVectorInterface } from "../interfaces/VersionVector";
 import { Peer } from "../types/Peer";
+import { fetchAvatar } from "../events/fetchAvatar";
+import { Avatar } from "../types/Avatar";
 
 export const createBroadcast = (peerjs: Peerjs, siteId: string, targetPeerId: string) => {
   const broadcast: Broadcast = {
@@ -32,13 +34,14 @@ export const createBroadcast = (peerjs: Peerjs, siteId: string, targetPeerId: st
       broadcast.outgoingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
       broadcast.incomingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
     });
-    eventBus.on("broadcastAddToNetwork", ({ peerToBeAdded, peerSender, networkVersion }) => {
+    eventBus.on("broadcastAddToNetwork", async ({ peerToBeAdded, peerSender, networkVersion }) => {
+      const avatar: Avatar = await fetchAvatar(peerToBeAdded.peerId);
       // only tell you peers this has been added
       const payload: PeerAddToNetworkEvent = {
         type: "addToNetwork",
         siteId: peerSender.siteId, // this should be the id of the whoever send the request
         peerId: peerSender.peerId,
-        peerToBeAdded: { peerId: peerToBeAdded.peerId, siteId: peerToBeAdded.siteId },
+        peerToBeAdded: { peerId: peerToBeAdded.peerId, siteId: peerToBeAdded.siteId, avatar: avatar },
         networkVersion: networkVersion,
       };
       broadcast.outgoingConnections.forEach((peer) => {

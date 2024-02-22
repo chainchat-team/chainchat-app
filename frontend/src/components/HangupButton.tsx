@@ -6,11 +6,11 @@ interface HangupButtonProps {
 }
 
 const HangupButton: React.FC<HangupButtonProps> = ({ peerId }) => {
-  const handleClick = () => {
+  const onClickHandler = () => {
     eventBus.emit("hangup", peerId);
   };
 
-  return <button onClick={handleClick}>Hang Up</button>;
+  return <img src="../assets/images/hangup.png" alt="Call" onClick={onClickHandler} className="phone" />;
 };
 
 export default HangupButton;
