@@ -1,20 +1,17 @@
 // Import React dependencies.
-import React, { useCallback, useEffect, useRef, useState, version } from "react";
-import { BaseElement, BaseOperation, Editor, createEditor, string, Text, Point, Operation, BaseEditor } from "slate";
+import { useEffect, useRef, useState } from "react";
+import { createEditor, BaseEditor, Text, Element } from "slate";
 import { Editable, Slate, withReact } from "slate-react";
 import { eventBus } from "../lib/events/create-eventbus";
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../lib/types/BroadcastEventTypes";
 import { Descendant } from "../types/Descendant";
 import initialValue from "../slateInitialValue";
 import { Crdt, CrdtInterface } from "../lib/interfaces/Crdt";
-import { BroadcastOperation } from "../types/BroadcastOperation";
-import { Char, CharInterface } from "../lib/interfaces/Char";
-import { Editor as CustomEditor } from "../lib/interfaces/Editor";
-import { VersionInterface } from "../lib/interfaces/Version";
-import { VersionVector, VersionVectorInterface } from "../lib/interfaces/VersionVector";
-import { CustomOperation, MergeNodeOperation, RemoveNodeOperation, RemoveTextOperation } from "../lib/types/Operation";
-import { NetworkInterface } from "../lib/interfaces/Network";
+import { Char } from "../lib/interfaces/Char";
+import { VersionVectorInterface } from "../lib/interfaces/VersionVector";
+import { CustomOperation } from "../lib/types/Operation";
 import "../css/style.css";
+import { PeerEvent } from "../lib/types/PeerEventTypes";
 
 type PropsType = {
   crdt: Crdt;
@@ -56,7 +53,7 @@ const withCustomRemoveOperation = (editor: BaseEditor, crdt: Crdt) => {
       chars.forEach((char) => {
         if (crdt.versionVector === null) throw new Error("Crdt version vector is null.");
         CrdtInterface.incrementVersionVector(crdt);
-        const payload: BroadcastCrdtEvent = {
+        const payload: PeerEvent = {
           siteId: crdt.siteId,
           peerId: crdt.peerId as string,
           type: eventType,
@@ -93,18 +90,18 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     eventBus.on("handleSyncRequest", initialStructlistener);
 
     const responseInitialStruct = () => {
-      eventBus.emit("response_initial_struct", editor.children);
+      editor.children;
+      eventBus.emit("response_initial_struct", editor.children as Descendant[]);
     };
     eventBus.on("request_initial_struct", responseInitialStruct);
     eventBus.on("requestEditorDescendant", () => {
-      eventBus.emit("responseEditorDescendant", editor.children);
+      eventBus.emit("responseEditorDescendant", editor.children as Descendant[]);
     });
 
     const handleRemoteOperation = async (operation: BroadcastCrdtEvent) => {
       console.log("---handleRemoteOperation-start----");
-      console.log(crdt);
-      console.log(operation.version);
-      if (VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version)) return;
+      if (crdt.versionVector != null && VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version))
+        return;
       if (operation.type === "insert") {
         await CrdtInterface.handleRemoteInsert(crdt, editor, operation.char, operation.version);
       } else if (operation.type === "delete") {
@@ -131,7 +128,9 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
       onChange={(decendant) => {
         const totalLines = editor.children.length;
         const totalWords = editor.children.reduce((acc, child) => {
-          return acc + child.children.map((c) => c.text.split(" ").filter((c) => c != "").length)[0];
+          return (
+            acc + (child as Element).children.map((c) => (c as Text).text.split(" ").filter((c) => c != "").length)[0]
+          );
         }, 0);
         const cursorPoint = editor.selection?.anchor;
 

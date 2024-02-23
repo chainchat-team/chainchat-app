@@ -2,10 +2,9 @@ import { Peer as PeerJs } from "peerjs";
 import { eventBus } from "../events/create-eventbus";
 import { AddressInterface } from "../interfaces/Address";
 import { fetchNetwork } from "../events/fetchNetwork";
-export function createAddress(host: string, port: string, peerId: string, peerjs: PeerJs) {
+export function createAddress(origin: string, peerId: string, peerjs: PeerJs) {
   const address = {
-    host: host,
-    port: port,
+    origin: origin,
     targetPeerId: peerId,
     peerId: "",
   };
@@ -13,14 +12,14 @@ export function createAddress(host: string, port: string, peerId: string, peerjs
     address.peerId = id;
     eventBus.emit("updateAddress", { ...address });
   });
-  eventBus.on("broadcastAddToNetwork", ({ peerToBeAdded, peerSender, networkVersion }) => {
+  eventBus.on("broadcastAddToNetwork", ({ peerToBeAdded }) => {
     if (address.targetPeerId === "") {
       address.targetPeerId = peerToBeAdded.peerId;
       window.history.pushState({}, "", AddressInterface.getAddressBarUrl(address));
       eventBus.emit("updateAddress", { ...address });
     }
   });
-  eventBus.on("broadcastRemoveFromNetwork", async ({ peerToBeRemoved, peerSender, networkVersion, connectionType }) => {
+  eventBus.on("broadcastRemoveFromNetwork", async ({ peerToBeRemoved }) => {
     if (address.targetPeerId === peerToBeRemoved.peerId) {
       const network = await fetchNetwork();
       const possibleNextConnections = network.globalPeers.filter(

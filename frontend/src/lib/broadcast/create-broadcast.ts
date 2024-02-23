@@ -1,17 +1,7 @@
 import { Peer as Peerjs } from "peerjs";
 import { Broadcast, BroadcastInterface } from "../interfaces/Broadcast";
 import { eventBus } from "../events/create-eventbus";
-import {
-  BasePeerEvent,
-  PeerAddToNetworkEvent,
-  PeerCrdtEvent,
-  PeerRemoveFromNetworkEvent,
-} from "../types/PeerEventTypes";
-import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
-import { VersionVector, VersionVectorInterface } from "../interfaces/VersionVector";
-import { Peer } from "../types/Peer";
-import { fetchAvatar } from "../events/fetchAvatar";
-import { Avatar } from "../types/Avatar";
+import { PeerAddToNetworkEvent, PeerCrdtEvent, PeerEvent, PeerRemoveFromNetworkEvent } from "../types/PeerEventTypes";
 
 export const createBroadcast = (peerjs: Peerjs, siteId: string, targetPeerId: string) => {
   const broadcast: Broadcast = {
@@ -24,13 +14,13 @@ export const createBroadcast = (peerjs: Peerjs, siteId: string, targetPeerId: st
     _isCloser: false,
     targetPeerId: targetPeerId,
   };
-  peerjs.on("open", (id: string) => {
+  peerjs.on("open", () => {
     eventBus.emit("peerId", broadcast.peer.id);
-    eventBus.on("insert", (data: BroadcastCrdtEvent) => {
+    eventBus.on("insert", (data: PeerEvent) => {
       broadcast.outgoingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
       broadcast.incomingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
     });
-    eventBus.on("delete", (data: BroadcastCrdtEvent) => {
+    eventBus.on("delete", (data: PeerEvent) => {
       broadcast.outgoingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
       broadcast.incomingConnections.forEach((peer) => peer.connection?.send(data as PeerCrdtEvent));
     });

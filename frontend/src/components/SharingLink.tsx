@@ -12,12 +12,12 @@ const SharingLink = () => {
   useEffect(() => {
     const asyncSetLink = async () => {
       const address = await fetchAddress();
-      setLink(`${address.host}:${address.port}/?${address.peerId}`);
+      setLink(`${address.origin}/?${address.peerId}`);
     };
     asyncSetLink();
 
     const updateLinkListener = (address: Address) => {
-      setLink(`${address.host}:${address.port}/?${address.peerId}`);
+      setLink(`${address.origin}/?${address.peerId}`);
     };
     eventBus.on("updateAddress", updateLinkListener);
 

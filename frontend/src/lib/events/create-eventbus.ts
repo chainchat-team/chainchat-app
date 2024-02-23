@@ -1,7 +1,6 @@
 import mitt, { Emitter } from "mitt";
 import { Descendant } from "../../types/Descendant";
 import { BroadcastCrdtEvent, BroadcastSyncRequestEvent } from "../types/BroadcastEventTypes";
-import { BroadcastOperation } from "../../types/BroadcastOperation";
 import { Peer } from "../types/Peer";
 import { Network } from "../interfaces/Network";
 import { VersionVector } from "../interfaces/VersionVector";
@@ -10,7 +9,8 @@ import { Crdt } from "../interfaces/Crdt";
 import { HuddleManager } from "../interfaces/HuddleManager";
 import { Address } from "../interfaces/Address";
 import { Avatar } from "../types/Avatar";
-import { BasePoint, Point } from "slate";
+import { BasePoint } from "slate";
+import { PeerEvent } from "../types/PeerEventTypes";
 type Events = {
   //crdt -> broadcast
   responseVersionVector: Partial<VersionVector>;
@@ -69,8 +69,8 @@ type Events = {
   enableEditor: boolean;
 
   //editor -> broadcast
-  insert: BroadcastCrdtEvent;
-  delete: BroadcastCrdtEvent;
+  insert: PeerEvent;
+  delete: PeerEvent;
 
   //call component -> broadcast
   call: string;

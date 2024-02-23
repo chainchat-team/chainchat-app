@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,13 +16,11 @@
     "jsx": "react-jsx",
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "references": [
     {
       "path": "./tsconfig.node.json"

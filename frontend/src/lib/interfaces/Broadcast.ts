@@ -1,14 +1,8 @@
 import { Peer as PeerJs, DataConnection } from "peerjs";
 import { addOutGoingConnection } from "../broadcast/addOutGoingConnection";
 import { addIncomingConnection } from "../broadcast/addIncomingConnection";
-import { BaseOperation, Operation } from "slate";
-import { processOutgoingBuffer } from "../broadcast/processOutgoingBuffer";
 import { handleIncomingConnection } from "../broadcast/connection/handleIncomingConnection";
 import { handleOutgoingConnection } from "../broadcast/connection/handleOutgoingConnection";
-import { sendOperation } from "../broadcast/sendOperation";
-import { BroadcastOperation } from "../../types/BroadcastOperation";
-import { BroadcastCrdtEvent } from "../types/BroadcastEventTypes";
-import { PeerCrdtEvent } from "../types/PeerEventTypes";
 import { removeOutgoingConnection } from "../broadcast/removeOutgoingConnection";
 import { Peer } from "../types/Peer";
 import { getIncomingPeer } from "../broadcast/getIncomingPeer";
@@ -21,6 +15,7 @@ import { getAvailablePeer } from "../broadcast/getAvailablePeer";
 import { getConnectionThreshold } from "../broadcast/getConnectionThreshold";
 import { handleIncomingMediaConnection } from "../broadcast/connection/handleIncomingMediaConnection";
 import { handleOutgoingMediaConnection } from "../broadcast/connection/handleOutgoingMediaConnection";
+import { Operation } from "slate/dist/interfaces/operation";
 
 export interface Broadcast {
   peer: PeerJs;
@@ -34,21 +29,17 @@ export interface Broadcast {
 }
 
 export interface BroadcastInterface {
-  // bindServerEvents: (boardcast: Broadcast, targetPeerId: number) => void;
   addOutGoingConnection: (broadcast: Broadcast, peer: Peer) => void;
   addIncomingConnection: (broadcast: Broadcast, peer: Peer) => void;
   removeOutgoingConnection: (broadcast: Broadcast, peer: Peer) => void;
   removeIngoingConnection: (broadcast: Broadcast, peer: Peer) => void;
   getIncomingPeer: (broadcast: Broadcast, connection: DataConnection) => Peer;
   getOutgoingPeer: (broadcast: Broadcast, connection: DataConnection) => Peer;
-  // processOutgoingBuffer: (broadcast: Broadcast, connection: DataConnection) => void;
-  // acceptConnRequest: (broadcast: Broadcast, peerId: string, siteId: string) => void;
   handleIncomingConnection: (broadcast: Broadcast, peer: PeerJs) => void;
   handleOutgoingConnection: (broadcast: Broadcast, peer: PeerJs, targetPeerId: string) => void;
   handleIncomingMediaConnection: (broadcast: Broadcast) => void;
   handleOutgoingMediaConnection: (broadcast: Broadcast, targetPeerId: string) => void;
   findNewTarget: (broadcast: Broadcast) => void;
-  sendOperation: (broadcast: Broadcast, operations: PeerCrdtEvent) => void;
   closeDeadPeers: (broadcast: Broadcast) => void;
   close: (broadcast: Broadcast) => void;
 
@@ -65,13 +56,11 @@ export const BroadcastInterface: BroadcastInterface = {
   removeIngoingConnection: (...args) => removeOutgoingConnection(...args),
   getIncomingPeer: (...args) => getIncomingPeer(...args),
   getOutgoingPeer: (...args) => getOutgoingPeer(...args),
-  // processOutgoingBuffer: (...args) => processOutgoingBuffer(...args),
   handleIncomingConnection: (...args) => handleIncomingConnection(...args),
   handleOutgoingConnection: (...args) => handleOutgoingConnection(...args),
   handleIncomingMediaConnection: (...args) => handleIncomingMediaConnection(...args),
   handleOutgoingMediaConnection: (...args) => handleOutgoingMediaConnection(...args),
   findNewTarget: (...args) => findNewTarget(...args),
-  sendOperation: (...args) => sendOperation(...args),
   closeDeadPeers: (...args) => closeDeadPeers(...args),
   close: (...args) => close(...args),
   hasReachedMax: (...args) => hasReachedMax(...args),
