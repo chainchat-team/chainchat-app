@@ -23,7 +23,12 @@ import StatusBar from "./components/StatusBar.tsx";
 const targetPeerId = location.search.slice(1) || "";
 const peerjs = new Peerjs();
 
-const origin = import.meta.env.VITE_ORIGIN || ""; // Add this line to provide a default value for process.env.origin
+let origin = import.meta.env.VITE_ORIGIN || "";
+
+if (!origin && import.meta.env.RAILWAY_ORIGIN) {
+  origin = import.meta.env.RAILWAY_ORIGIN;
+}
+
 createAddress(origin, targetPeerId, peerjs); // Fix the argument by using the 'origin' variable
 const siteId = UUID();
 createNetwork(peerjs, siteId);

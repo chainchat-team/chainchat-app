@@ -1,5 +1,0 @@
-build:
-  command: cd frontend && npm run build
-  output: frontend/dist
-deploy:
-  type: static

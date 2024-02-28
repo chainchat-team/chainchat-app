@@ -12,7 +12,7 @@ export function handleIncomingMediaConnection(broadcast: Broadcast) {
     if (huddleManager.mediaStream) {
       mediaStream = huddleManager.mediaStream;
     } else {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       eventBus.emit("initMediaStream", mediaStream);
     }
     // const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
