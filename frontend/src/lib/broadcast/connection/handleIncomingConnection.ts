@@ -26,9 +26,7 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
       let data;
       switch (connData.type) {
         case "connRequest":
-          console.log("--received connRequest---");
           // you can send them a syncRequest or forwardRequest
-          console.log(hasReachedMax);
           if (hasReachedMax) {
             //get a avialabe user.
             const availablePeer: Peer | undefined = await BroadcastInterface.getAvailablePeer(broadcast);
@@ -78,8 +76,7 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
               versionVector: crdt.versionVector,
               network: network,
             };
-            console.log("---sending initaldata--");
-            console.log(initialData);
+
             connection.send(initialData);
           }
           break;
@@ -101,7 +98,6 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
           });
           break;
         default:
-          console.log("--emitting handlRemoteOperation---");
           eventBus.emit("handleRemoteOperation", connData as BroadcastCrdtEvent);
           break;
       }
@@ -146,8 +142,6 @@ export function handleIncomingConnection(broadcast: Broadcast, peerjs: PeerJs) {
             connectionType: "in",
           });
         } catch (error) {
-          console.log(error);
-          console.log("possiblly close connection because, it was forwarded");
           return;
         }
       }

@@ -17,13 +17,11 @@ export async function handleOutgoingMediaConnection(broadcast: Broadcast, target
   const huddleManager = await fetchHuddleManager();
   const isInActiveCall = huddleManager.activeCalls.find((item) => item.peerId === targetPeerId);
   if (isInActiveCall) {
-    console.log(`returing because, ${targetPeerId} already in active call`);
     return;
   }
 
   //check if we are making call to ourself
   if (targetPeerId === broadcast.peer.id) {
-    console.log(`returing because, ${targetPeerId} is yourself`);
     return;
   }
 

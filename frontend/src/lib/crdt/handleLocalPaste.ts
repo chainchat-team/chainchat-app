@@ -34,7 +34,6 @@ export function handleLocalPaste(crdt: Crdt, editor: Editor, event: React.Clipbo
 
   // //build operations for each element
   characters.forEach((element) => {
-    console.log(editor.selection);
     if (element === "\n") {
       const splitAtLeaf: SplitNodeOperation = {
         type: "split_node",

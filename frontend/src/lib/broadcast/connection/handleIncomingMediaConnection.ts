@@ -22,8 +22,6 @@ export function handleIncomingMediaConnection(broadcast: Broadcast) {
       // we need to get gett
       const network: Network = await fetchNetwork();
 
-      console.log("from handleIncomingMediaConnection:");
-      console.log(connection.peer);
       const targetPeer = network.globalPeers.find((item) => item.peerId === connection.peer);
       if (!targetPeer) {
         throw Error(

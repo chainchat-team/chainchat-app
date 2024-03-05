@@ -13,7 +13,7 @@ import { VersionVectorInterface } from "../../interfaces/VersionVector";
 import { PeerAddToNetworkEvent, PeerEvent, PeerRemoveFromNetworkEvent } from "../../types/PeerEventTypes";
 export function handleOutgoingConnection(broadcast: Broadcast, peerjs: PeerJs, targetId: string) {
   const connection: DataConnection = peerjs.connect(targetId);
-  console.log("----handlingOutgoingRequest-----");
+
   connection.on("open", () => {
     connection.send({
       type: "connRequest",
@@ -22,7 +22,7 @@ export function handleOutgoingConnection(broadcast: Broadcast, peerjs: PeerJs, t
     });
     connection.on("data", (payload: unknown) => {
       const connData = payload as BroadcastEvent | PeerEvent;
-      console.log("----handlingOutgoingRequest data-----");
+
       let data;
       switch (connData.type) {
         case "syncRequest":
@@ -35,8 +35,6 @@ export function handleOutgoingConnection(broadcast: Broadcast, peerjs: PeerJs, t
           eventBus.emit("initNetwork", (connData as BroadcastSyncRequestEvent).network as Network);
           break;
         case "forwardRequest":
-          console.log(`---Forwarding request---`);
-          console.log(`---Forwarding request---`);
           BroadcastInterface.handleOutgoingConnection(
             broadcast,
             peerjs,
@@ -46,7 +44,6 @@ export function handleOutgoingConnection(broadcast: Broadcast, peerjs: PeerJs, t
           connection.close();
           break;
         case "networkFull":
-          console.log("Network Full!");
           broadcast._isCloser = true;
           connection.close();
           break;
@@ -68,7 +65,6 @@ export function handleOutgoingConnection(broadcast: Broadcast, peerjs: PeerJs, t
           });
           break;
         default:
-          console.log("--emitting handlRemoteOperation---");
           eventBus.emit("handleRemoteOperation", connData as BroadcastCrdtEvent);
           break;
       }

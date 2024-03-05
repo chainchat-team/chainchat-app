@@ -101,7 +101,6 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
     });
 
     const handleRemoteOperation = async (operation: BroadcastCrdtEvent) => {
-      console.log("---handleRemoteOperation-start----");
       if (crdt.versionVector != null && VersionVectorInterface.hasBeenApplied(crdt.versionVector, operation.version))
         return;
       if (operation.type === "insert") {
@@ -112,7 +111,6 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
       await CrdtInterface.processDeletionBuffer(crdt, editor);
       const operationType = operation.type === "insert" ? "insert" : "delete";
       eventBus.emit(operationType, operation);
-      console.log("---handleRemoteOperation--end----");
     };
     eventBus.on("handleRemoteOperation", handleRemoteOperation);
 
@@ -158,42 +156,41 @@ const SlateEditor = ({ crdt, peerId, siteId }: PropsType) => {
       }}
     >
       <Editable
-        renderLeaf={(props) => {
-          // Inside your renderLeaf function...
-          const { children, attributes } = props;
-          // Check if the editor is empty
-          const leaf = props.leaf as Text;
-          if (leaf.characters.length === 0) {
-            return <span {...attributes}>{children}</span>;
-          }
+        // renderLeaf={(props) => {
+        //   // Inside your renderLeaf function...
+        //   const { children, attributes } = props;
+        //   // Check if the editor is empty
+        //   const leaf = props.leaf as Text;
+        //   if (leaf.characters.length === 0) {
+        //     return <span {...attributes}>{children}</span>;
+        //   }
 
-          // Get the path of the leaf
+        //   // Get the path of the leaf
+        //   const path = CharInterface.findEditorPath(leaf.characters[0], editor);
 
-          const path = CharInterface.findEditorPath(leaf.characters[0], editor);
-
-          // Create a range from the path
-          const leafRange = Editor.range(editor, path);
-          // Calculate the width of the characters before the cursor
-          const textBeforeCursor = leaf.text.slice(0, dummyCursor?.anchor.offset);
-          const dummyCursorLeft = measureTextWidth(textBeforeCursor);
-          return (
-            <span {...props.attributes}>
-              {dummyCursor && Range.includes(leafRange, dummyCursor) && (
-                <span
-                  style={{
-                    position: "absolute",
-                    left: `${dummyCursorLeft}px`,
-                    top: "0",
-                    background: "blue",
-                    width: "2px",
-                    height: "1em",
-                  }}
-                />
-              )}
-              {props.children}
-            </span>
-          );
-        }}
+        //   // Create a range from the path
+        //   const leafRange = Editor.range(editor, path);
+        //   // Calculate the width of the characters before the cursor
+        //   const textBeforeCursor = leaf.text.slice(0, dummyCursor?.anchor.offset);
+        //   const dummyCursorLeft = measureTextWidth(textBeforeCursor);
+        //   return (
+        //     <span {...props.attributes}>
+        //       {dummyCursor && Range.includes(leafRange, dummyCursor) && (
+        //         <span
+        //           style={{
+        //             position: "absolute",
+        //             left: `${dummyCursorLeft}px`,
+        //             top: "0",
+        //             background: "blue",
+        //             width: "2px",
+        //             height: "1em",
+        //           }}
+        //         />
+        //       )}
+        //       {props.children}
+        //     </span>
+        //   );
+        // }}
         onPaste={(event) => {
           CrdtInterface.handleLocalPaste(crdt, editor, event);
           event.preventDefault();

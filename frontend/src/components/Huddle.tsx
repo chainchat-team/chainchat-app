@@ -26,8 +26,6 @@ const Huddle: FC<HuddleProps> = ({ peerId }) => {
       eventBus.off("updateHuddleManager", updateHuddleManagerListener);
     };
   }, []);
-  console.log(`From huddle, huddle manager:`);
-  console.log(huddleManager);
   return (
     <div>
       {huddleManager !== null ? (

@@ -50,12 +50,7 @@ export const createNetwork = (peerjs: PeerJs, siteId: string): Network => {
       } else {
         network.versionVector = VersionVectorInterface.update(network.versionVector, networkVersion);
       }
-      console.log("-----removeFromNetwork-----");
-      console.log(peerToBeRemoved);
-      console.log(peerSender);
-      console.log(isRemoved);
-      console.log(network.globalPeers);
-      console.log("-----removeFromNetwork-----");
+
       if (!!isRemoved) {
         if (connectionType === "in") {
           const peerCount = network.peerConnectionsCount[networkVersion.peer.peerId] || 0;

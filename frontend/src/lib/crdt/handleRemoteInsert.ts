@@ -6,8 +6,6 @@ import { SplitNodeOperation } from "../types/SplitNodeOperation";
 import { VersionVector, VersionVectorInterface } from "../interfaces/VersionVector";
 import { Version } from "../interfaces/Version";
 export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char, version: Version): void {
-  console.log("---handleRemoteInsert-----");
-
   const path = CharInterface.findEditorPath(char, editor);
   //find the leaf node at the path
 
@@ -54,6 +52,4 @@ export function handleRemoteInsert(crdt: Crdt, editor: Editor, char: Char, versi
 
   const versionVector: VersionVector = VersionVectorInterface.update(crdt.versionVector!, version);
   CrdtInterface.setVersionVector(crdt, versionVector);
-
-  console.log("---handleRemoteInsert-----");
 }

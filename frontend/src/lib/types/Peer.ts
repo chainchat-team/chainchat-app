@@ -1,5 +1,6 @@
 import { DataConnection, MediaConnection } from "peerjs";
 import { Avatar } from "./Avatar";
+import { Range } from "slate";
 
 export type Peer = {
   peerId: string;
@@ -8,4 +9,5 @@ export type Peer = {
   mediaConnection?: MediaConnection;
   mediaStream?: MediaStream;
   avatar?: Avatar;
+  cursor?: Range;
 };
