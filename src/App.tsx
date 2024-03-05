@@ -16,18 +16,10 @@ import "../src/css/style.css";
 import Navbar from "./components/Navbar.tsx";
 import StatusBar from "./components/StatusBar.tsx";
 
-// if (process.env.NODE_ENV !== "production") {
-//   dotenv.config();
-// }
-
 const targetPeerId = location.search.slice(1) || "";
 const peerjs = new Peerjs();
 
-let origin = import.meta.env.VITE_ORIGIN || "";
-
-if (!origin && import.meta.env.RAILWAY_ORIGIN) {
-  origin = import.meta.env.RAILWAY_ORIGIN;
-}
+const origin = location.origin;
 
 createAddress(origin, targetPeerId, peerjs); // Fix the argument by using the 'origin' variable
 const siteId = UUID();
