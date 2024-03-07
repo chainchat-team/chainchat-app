@@ -53,12 +53,12 @@ const App = () => {
             <div className="editor">
               <div className="header">
                 <SharingLink />
-                <button id="download" className="button">
+                {/* <button id="download" className="button">
                   Save
                 </button>
                 <button id="upload" className="button">
                   Upload
-                </button>
+                </button> */}
               </div>
               <SlateEditor crdt={crdt} peerId={peerjs.id} siteId={siteId} />
               <StatusBar />
